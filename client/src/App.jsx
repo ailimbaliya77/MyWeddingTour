@@ -15,7 +15,7 @@ import HostStep2 from './pages/HostStep2';
 import HostStep3 from './pages/HostStep3';
 import HostStep4 from './pages/HostStep4';
 import HostStep5 from './pages/HostStep5';
-import HostStep6 from './pages/HOstStep6';
+import HostStep6 from './pages/HostStep6';
 import './App.css';
 
 function App() {

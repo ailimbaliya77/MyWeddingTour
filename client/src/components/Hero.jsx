@@ -1,10 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import img1 from '../assets/India-Owen-3The-Ceremony-75-scaled.jpg'
 
 function Hero() {
   const headingRef = useRef(null);
+
+  gsap.registerPlugin(ScrollTrigger);
 
   useEffect(() => {
     if (headingRef.current) {

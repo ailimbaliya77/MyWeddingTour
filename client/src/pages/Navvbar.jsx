@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
-function Navvbar(){
+function Navvbar({setLoginOpen}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -21,17 +21,17 @@ function Navvbar(){
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8 font-semibold text-sm">
-          <Link to="/" className="text-sm lg:text-base hover:text-white transition">Home</Link>
-          <Link to="/weddings" className="text-sm lg:text-base hover:text-white transition">Weddings</Link>
+          <Link to="/" className="text-sm lg:text-base hover:text-white transition">HOME</Link>
+          <Link to="/weddings" className="text-sm lg:text-base hover:text-white transition">WEDDINGS</Link>
           <Link to="/FAQ" className="text-sm lg:text-base hover:text-white transition">FAQ</Link>
-          <Link to="/about-us" className="text-sm lg:text-base hover:text-white transition">About Us</Link>
-          <Link to="/contact" className="text-sm lg:text-base hover:text-white transition">Contact</Link>
+          <Link to="/about-us" className="text-sm lg:text-base hover:text-white transition">ABOUT US</Link>
+          <Link to="/contact" className="text-sm lg:text-base hover:text-white transition">CONTACT US</Link>
         </div>
         
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-          <Link to="/login" className="text-sm lg:text-base text-white hover:text-yellow-300 transition">Login</Link>
-          <Link to="/BecomeHost" className="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1.5 lg:px-4 lg:py-2 rounded text-sm lg:text-base transition">Become A Host</Link>
+          <button onClick={() => setLoginOpen(true)} className="text-sm lg:text-base text-white hover:text-yellow-300 transition">LOGIN</button>
+          <Link to="/BecomeHost" className="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1.5 lg:px-4 lg:py-2 rounded text-sm lg:text-base transition">BECOME A HOST</Link>
         </div>
         
         {/* Mobile Menu Button */}

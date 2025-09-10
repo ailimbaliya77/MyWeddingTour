@@ -1,4 +1,5 @@
 import React from 'react'
+import img1 from '../assets/wedding-portrait-770x515.jpg'
 
 function AboutUs()  {
   return (
@@ -14,7 +15,7 @@ function AboutUs()  {
           </div>
           
           <div className="w-full lg:w-1/2">
-            <img src="/images/about-story.jpg" alt="MyWeddingTour Story" className="rounded-lg shadow-lg w-full h-auto" />
+            <img src={img1} alt="MyWeddingTour Story" className="rounded-lg shadow-lg w-full h-auto" />
           </div>
         </div>
       </div>

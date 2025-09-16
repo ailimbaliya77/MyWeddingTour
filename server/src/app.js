@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import passport from "passport";
 import indexRouter from "./routes/index.routes.js";
 import {
   errorHandler,
@@ -8,8 +9,11 @@ import {
   validationHandler,
 } from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
+import './config/passport.js';
 
 const app = express();
+
+app.use(passport.initialize());
 
 app.use(cookieParser());
 app.use(express.json());

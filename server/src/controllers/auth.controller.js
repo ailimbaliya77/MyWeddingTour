@@ -68,6 +68,75 @@ export const authLogin = asyncHandler(async (req, res) => {
   );
 });
 
+export const authGoogle = asyncHandler(async (req, res) => {
+  const googleUser = req.user;
+
+  if (!googleUser?.emails[0].value) {
+    throw createHttpError(400, "Google account did not return an email");
+  }
+
+  let user = await UserModel.findOne({
+    googleId: googleUser.id,
+  })
+    .select("_id password isPlanner isEmailVerified")
+    .lean();
+
+  if (!user) {
+    user = await UserModel.findOneAndUpdate(
+      {
+        email: googleUser.emails[0].value,
+      },
+      {
+        googleId: googleUser.id,
+        $addToSet: { provider: "google" },
+      },
+      { new: true }
+    )
+      .select("_id password isPlanner isEmailVerified")
+      .lean();
+  }
+
+  if (!user) {
+    user = await UserModel.create({
+      email: googleUser.emails[0].value,
+      firstName: googleUser.name.givenName,
+      lastName: googleUser.name.familyName,
+      isPlanner: true,
+      isEmailVerified: true,
+      provider: ["google"],
+    });
+  }
+
+  const accessToken = generateToken(
+    user,
+    JWT_ACCESS_SECRET,
+    JWT_ACCESS_EXPIRE_TIME + "m"
+  );
+  const refreshToken = generateToken(
+    user,
+    JWT_REFRESH_SECRET,
+    JWT_REFRESH_EXPIRE_TIME + "d"
+  );
+
+  const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+  await TokenModel.create({
+    userId: user._id,
+    refreshToken: hashedRefreshToken,
+    device: req.headers["user-agent"],
+    ip: req.ip,
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+    maxAge: JWT_REFRESH_EXPIRE_TIME * 24 * 60 * 60 * 1000,
+  });
+
+  res.redirect(`https://ailimbaliya77.github.io/MyWeddingTour/#/host/register/step1?accessToken=${accessToken}`);
+});
+
 export const issueAccessToken = asyncHandler(async (req, res) => {
   const { refreshToken } = req.cookies;
 
@@ -91,7 +160,8 @@ export const issueAccessToken = asyncHandler(async (req, res) => {
     }
   }
 
-  if (!matchedDoc) throw createHttpError(403, "Invalid or expired refresh token");
+  if (!matchedDoc)
+    throw createHttpError(403, "Invalid or expired refresh token");
 
   const newAccessToken = generateToken(
     { _id: userId },
@@ -129,7 +199,8 @@ export const logout = asyncHandler(async (req, res) => {
     }
   }
 
-  if (!matchedDoc) throw createHttpError(403, "Invalid or expired refresh token");
+  if (!matchedDoc)
+    throw createHttpError(403, "Invalid or expired refresh token");
 
   res.json(getSuccessResponse({ message: "Logged out successfully" }));
 });

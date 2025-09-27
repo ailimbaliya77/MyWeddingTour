@@ -21,10 +21,10 @@ export const authLogin = asyncHandler(async (req, res) => {
     "_id password isPlanner isEmailVerified"
   );
 
+  if (!user) throw createHttpError(400, "Invalid credentials");
+
   if (!user.isEmailVerified)
     throw createHttpError(401, "Please verify your email before logging in");
-
-  if (!user) throw createHttpError(400, "Invalid credentials");
 
   const isMatch = await user.checkPassword(password);
   if (!isMatch) throw createHttpError(400, "Invalid credentials");
@@ -101,9 +101,10 @@ export const authGoogle = asyncHandler(async (req, res) => {
       email: googleUser.emails[0].value,
       firstName: googleUser.name.givenName,
       lastName: googleUser.name.familyName,
-      isPlanner: true,
+      // isPlanner: true,
       isEmailVerified: true,
       provider: ["google"],
+      googleId: googleUser.id,
     });
   }
 

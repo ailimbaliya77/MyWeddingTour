@@ -4,10 +4,10 @@ import { weddingInfoStep1, weddingInfoStep2 } from "../controllers/wedding.contr
 import { authenticate } from "../middlewares/auth.middleware.js";
 
 const weddingRouter = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ dest: "uploads/" });
 
 // weddingRouter.post("/upload-couple-photo");
 weddingRouter.post("/step-1", authenticate, weddingInfoStep1);
-// weddingRouter.post("/step-2", authenticate, upload.single("couplePhoto"), weddingInfoStep2);
+weddingRouter.post("/step-2", authenticate, upload.single("couplePhoto"), weddingInfoStep2);
 
 export default weddingRouter;

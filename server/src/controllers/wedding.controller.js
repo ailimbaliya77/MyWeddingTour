@@ -3,7 +3,8 @@ import { UserModel } from "../models/users.model.js";
 import { WeddingsModel } from "../models/weddings.model.js";
 import { asyncHandler } from "../utils/asynHandler.util.js";
 import { getSuccessResponse } from "../utils/response.util.js";
-import { bucket } from "../config/firebaseAdmin.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
 
 export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   const { id } = req.user;
@@ -29,7 +30,7 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
       phoneNumber: phone,
     },
     { upsert: true, new: true }
-  );
+  ).lean();
 
   return res.status(200).json(
     getSuccessResponse({
@@ -46,53 +47,35 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   );
 });
 
-// export const weddingInfoStep2 = asyncHandler(async (req, res) => {
-//   const file = req.file;
-//   const { storyDescription, _id: weddingId } = req.body;
+export const weddingInfoStep2 = asyncHandler(async (req, res) => {
+  const file = req.file;
+  const { storyDescription, weddingId } = req.body;
 
-//   const fileName = Date.now() + "-" + file.originalname;
-//   const blob = bucket.file(`uploads/${fileName}`);
+  const result = await cloudinary.uploader.upload(file.path, {
+    folder: "wedding-tour-couple-images",
+  });
 
-//   const blobStream = blob.createWriteStream({
-//     metadata: { contentType: file.mimetype },
-//   });
+  fs.unlinkSync(req.file.path);
 
-//   blobStream.on("error", (err) => {
-//     console.log(err);
-//     res.status(500).json(getSuccessResponse({ message: "Upload failed" }));
-//   });
+  const wedding = await WeddingsModel.findByIdAndUpdate(weddingId, {
+    cloudinaryPublicId: result.public_id,
+    listingPhotoURL: result.secure_url,
+    storyDescription: storyDescription,
+  }).lean();
 
-//   blobStream.on("finish", async () => {
-//     const wedding = await WeddingsModel.findByIdAndUpdate(
-//       weddingId,
-//       {
-//         listingPhotoURL: `uploads/${fileName}`,
-//         storyDescription,
-//       },
-//       { new: true }
-//     );
-
-//     if (!wedding) {
-//       throw createHttpError(400, "Wedding not found");
-//     }
-
-//     const data = {
-//       _id: wedding._id,
-//       bride: wedding.bride,
-//       groom: wedding.groom,
-//       weddingEmail: wedding.email,
-//       phoneNumber: wedding.phoneNumber,
-//       storyDescription,
-//     };
-
-//     res.json(
-//       getSuccessResponse({
-//         message: "Wedding step 2 successfully completed",
-//         status: 200,
-//         data,
-//       })
-//     );
-//   });
-
-//   blobStream.end(file.buffer);
-// });
+  return res.status(200).json(
+    getSuccessResponse({
+      message: "Wedding step-2 done successfully",
+      status: 200,
+      data: {
+        _id: wedding._id,
+        bride: wedding.bride,
+        groom: wedding.groom,
+        weddingEmail: wedding.email,
+        phoneNumber: wedding.phoneNumber,
+        storyDescription: wedding.storyDescription,
+        coupleImage: wedding.listingPhotoURL,
+      },
+    })
+  );
+});

@@ -19,6 +19,7 @@ const weddingsSchema = new mongoose.Schema({
   },
   weddingEmail: { type: String, required: true },
   listingPhotoURL: { type: String, default: null },
+  cloudinaryPublicId: { type: String, default: null },
   storyDescription: { type: String, default: null },
   videoLink: { type: String, default: null },
   totalWeddingDays: { type: Number, default: 1 },

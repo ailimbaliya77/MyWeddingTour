@@ -5,7 +5,7 @@ export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer "))
-    throw createHttpError(401, "No token provided");
+    throw createHttpError(401, "Unauthorized");
 
   const accessToken = authHeader.split(" ");
 

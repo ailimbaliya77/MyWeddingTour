@@ -32,4 +32,4 @@ authRouter.get(
   authGoogle
 );
 
-export const AuthRouter = authRouter;
+export default authRouter;

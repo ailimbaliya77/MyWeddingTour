@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import Navvbar from './pages/Navvbar';
 import Footerr from './pages/Footerr';
 import HomePage  from './pages/HomePage'
-import WeddingsPage from './pages/WeddingsPage';
+import Weddings from './pages/Weddings';
 import WeddingDetailsPage from './pages/WeddingDetailsPage';
 import AboutUs from './pages/AboutUs';
 import Contact from './pages/ContactPage';
@@ -89,7 +89,7 @@ const removeWedding = (id) => {
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/BecomeHost" element={<HostLandingPage />} />
-          <Route path="/weddings" element={<WeddingsPage weddings={weddings} removeWedding={removeWedding} />}/>
+          <Route path="/weddings" element={<Weddings weddings={weddings} removeWedding={removeWedding} />}/>
           <Route path="host/register/step1" element={<HostStep1 formData={formData} setFormData={setFormData} />} />
           <Route path="/weddings/register/step2" element={<HostStep2 formData={formData} setFormData={setFormData} />} />
           <Route path="/weddings/register/step3" element={<HostStep3 formData={formData} setFormData={setFormData} />} />

@@ -9,13 +9,41 @@ const HostStep1 = ({ formData, setFormData }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleNext = () => {
-    navigate("/weddings/register/step2");
+  const handleNext = async () => {
+    console.log("Submitting Step 1 data:", formData);
+    try {
+      const res = await fetch("http://localhost:3000/api/v1/wedding/step-1", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          brideFirst: formData.brideFirst,
+          brideLast: formData.brideLast,
+          groomFirst: formData.groomFirst,
+          groomLast: formData.groomLast,
+          email: formData.email,
+          phone: formData.phone,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log("✅ Step 1 saved:", data);
+        setFormData({ ...formData, weddingId: data.weddingId });
+        navigate("/weddings/register/step2");
+      } else {
+        alert(`❌ Error: ${data.message || "Failed to save data"}`);
+      }
+    } catch (error) {
+      console.error("Error submitting step 1:", error);
+      alert("Something went wrong while saving your details.");
+    }
   };
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-6 bg-white shadow-lg rounded-lg">
-      {/* Header */}
       <h2 className="text-xl font-semibold text-gray-800 mb-1">
         HI {formData.brideFirst || "HOST"}, LET’S GET YOU READY TO BECOME A HOST
       </h2>
@@ -23,7 +51,6 @@ const HostStep1 = ({ formData, setFormData }) => {
         <span className="font-bold text-teal-600">STEP 1</span> About you
       </p>
 
-      {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 p-4 mb-6 rounded-lg text-sm text-gray-700">
         <p>
           Your details are needed for identification purposes and for us to
@@ -117,7 +144,6 @@ const HostStep1 = ({ formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Info Banner */}
       <div className="bg-green-50 border border-green-200 p-4 mb-6 rounded-lg text-sm text-gray-700">
         <p>
           ✅ We promise not to spam you or your family. We will only contact you
@@ -125,9 +151,9 @@ const HostStep1 = ({ formData, setFormData }) => {
         </p>
       </div>
 
-      {/* Buttons */}
       <div className="flex justify-end">
         <button
+          type="button"
           onClick={handleNext}
           className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
         >

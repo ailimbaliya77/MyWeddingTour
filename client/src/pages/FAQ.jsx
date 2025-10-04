@@ -16,127 +16,48 @@ const FAQ = () => {
 
   const faqCategories = [
     {
-      title: "Getting Started",
-      icon: Heart,
-      questions: [
-        {
-          question: "What is MyWeddingTour?",
-          answer: "MyWeddingTour is a platform that helps couples create ticketed wedding experiences, allowing them to manage guest lists, collect payments, and organize their special day seamlessly."
-        },
-        {
-          question: "How do I create my wedding event?",
-          answer: "Simply sign up for an account, click 'Create Event', fill in your wedding details including date, venue, and ticket pricing, then share your unique link with guests."
-        },
-        {
-          question: "Is there a cost to use the platform?",
-          answer: "We offer a freemium model with basic features available for free. Premium features and higher guest limits are available through our paid plans starting at $29/month."
-        }
-      ]
-    },
-    {
-      title: "Event Management",
-      icon: Calendar,
-      questions: [
-        {
-          question: "Can I set different ticket prices for different guests?",
-          answer: "Yes! You can create multiple ticket tiers (VIP, Standard, Family packages) with different pricing and benefits. You can also send discount codes to specific guests."
-        },
-        {
-          question: "How far in advance should I create my wedding event?",
-          answer: "We recommend creating your event 3-6 months before your wedding date to give guests plenty of time to purchase tickets and make arrangements."
-        },
-        {
-          question: "Can I modify event details after creating them?",
-          answer: "Absolutely! You can update event details, pricing, and descriptions at any time. Guests who have already purchased tickets will be automatically notified of any changes."
-        }
-      ]
-    },
-    {
-      title: "Guest Management",
+      title: "General Questions",
       icon: Users,
       questions: [
         {
-          question: "How do guests purchase tickets?",
-          answer: "Guests receive a unique link to your wedding page where they can view event details, select ticket types, and complete their purchase securely online."
+          question: "What is MyWeddingTour?",
+          answer: "MyWeddingTour is an online platform that connects couples hosting special events with guests interested in being part of cultural celebrations. It facilitates connections, bookings, and seamless communication—but does not manage logistics like venues or transportation."
         },
         {
-          question: "Can guests bring plus-ones?",
-          answer: "Yes! You can enable plus-one options when setting up tickets. Guests can indicate their plus-one during the ticket purchase process."
+          question: "What does MyWeddingTour actually do?",
+          answer: "We provide the platform for discovery, profile creation, bookings, and secure transactions. We don’t run events or offer logistics—we simply help you connect and collaborate."
         },
         {
-          question: "What if a guest needs to cancel?",
-          answer: "You can set your own cancellation policy. Guests can request cancellations through their ticket confirmation email, and you can approve refunds based on your policy."
+          question: "Why is there a fee to attend?",
+          answer: "Attending an event usually comes with a small contribution—like a heartfelt gesture that helps support the occasion and offset hosting costs. It also ensures that attendees are genuinely interested and respectful."
         },
         {
-          question: "How do I track RSVPs?",
-          answer: "Your dashboard provides real-time RSVP tracking, showing who has confirmed, pending responses, and detailed guest lists with contact information."
-        }
-      ]
-    },
-    {
-      title: "Payments & Pricing",
-      icon: Gift,
-      questions: [
-        {
-          question: "What payment methods do you accept?",
-          answer: "We accept all major credit cards, debit cards, PayPal, Apple Pay, and Google Pay. All transactions are secured with industry-standard encryption."
+          question: "Why would couples open their event to outside guests?",
+          answer: "Couples often want to share their traditions, showcase their culture, and make new global connections. Hosting through [YourPlatformName] allows them to broaden their experience and celebrate with a diverse audience."
         },
         {
-          question: "When do I receive payment from ticket sales?",
-          answer: "Funds are transferred to your bank account weekly, typically within 2-3 business days. You can track all transactions in your dashboard."
+          question: "How do I know guests are respectful?",
+          answer: "All attendees register and pay in advance, which demonstrates their commitment and respect for the event and hosts. We also enable communication beforehand to foster trust and understanding."
         },
         {
-          question: "Are there any transaction fees?",
-          answer: "We charge a small processing fee of 2.9% + $0.30 per transaction to cover payment processing costs. No hidden fees or monthly charges for basic plans."
+          question: "How does the registration process work?",
+          answer: "(host side): Hosts fill out a short form with event details and date. Once verified, the event is listed. Only confirmed attendees get access to the full location and schedule. (guest side): Guests browse events, register, and pay a small fee to confirm their spot. They then receive full event details and can communicate with hosts."
         },
         {
-          question: "Can I offer payment plans for guests?",
-          answer: "Yes! You can enable installment payment options, allowing guests to pay for their tickets in 2-4 installments leading up to your wedding date."
-        }
-      ]
-    },
-    {
-      title: "Wedding Day Features",
-      icon: Camera,
-      questions: [
-        {
-          question: "How does check-in work on the wedding day?",
-          answer: "Guests show their digital tickets (QR codes) at the venue entrance. You can use our mobile app to scan tickets and check guests in quickly."
+          question: "Who controls the event details?",
+          answer: "Hosts control guest lists, event timing, attire preferences, dress code, and location—ensuring they stay in charge of their celebration."
         },
         {
-          question: "Can I collect photos from guests during the wedding?",
-          answer: "Yes! Our photo sharing feature allows guests to upload photos directly to your wedding album using a shared link or QR code."
+          question: "What about safety and legal matters?",
+          answer: "While we review profiles, all arrangements—including logistics, conduct, and insurance—are managed directly between hosts and guests. We encourage you to take precautions and confirm arrangements in advance."
         },
         {
-          question: "What happens if someone loses their ticket?",
-          answer: "No problem! Guests can access their tickets anytime through their email confirmation. You can also look up any guest in your dashboard and resend their ticket."
-        }
-      ]
-    },
-    {
-      title: "Technical Support",
-      icon: Music,
-      questions: [
-        {
-          question: "What if I need help setting up my event?",
-          answer: "Our support team is available 24/7 via chat, email, or phone. We also offer free setup assistance calls for premium users."
+          question: "Can I reach the host before the event?",
+          answer: "Yes—communication is encouraged! We facilitate messaging so both hosts and guests can ask questions, share plans, and build a rapport ahead of time."
         },
-        {
-          question: "Is the platform mobile-friendly?",
-          answer: "Absolutely! Both the guest experience and your admin dashboard are fully optimized for mobile devices, tablets, and desktop computers."
-        },
-        {
-          question: "Can I integrate with other wedding planning tools?",
-          answer: "Yes! We integrate with popular wedding planning platforms like The Knot, WeddingWire, and various venue management systems."
-        },
-        {
-          question: "What if there are technical issues on my wedding day?",
-          answer: "We provide priority support on your wedding day with a dedicated hotline. Our team monitors all events and can assist with any technical concerns immediately."
-        }
       ]
     }
-  ];
-
+  ]
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
       {/* Header */}

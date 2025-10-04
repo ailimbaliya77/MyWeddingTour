@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useWeddingStore from "../store/WeddingStore";
 
-const HostFormPage = ({ onSubmit }) => {
+const HostFormPage = () => {
   const navigate = useNavigate();
+  const addWedding = useWeddingStore((state) => state.addWedding);
 
   const [form, setForm] = useState({
     coupleNames: "",
@@ -21,15 +23,13 @@ const HostFormPage = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form); // adds to weddings list
-    navigate("/weddings"); // redirect back to weddings page
+    addWedding(form); 
+    navigate("/weddings"); 
   };
 
   return (
     <div className="container mx-auto px-6 py-10 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Become a Host
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Become a Host</h1>
       <p className="text-gray-600 text-center mb-8">
         Share your wedding with friends & family. Fill in your details below to create your own wedding page.
       </p>

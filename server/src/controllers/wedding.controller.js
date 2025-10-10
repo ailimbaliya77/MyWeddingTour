@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asynHandler.util.js";
 import { getSuccessResponse } from "../utils/response.util.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
+import createHttpError from "http-errors";
 
 export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   const { id } = req.user;
@@ -57,11 +58,17 @@ export const weddingInfoStep2 = asyncHandler(async (req, res) => {
 
   fs.unlinkSync(req.file.path);
 
-  const wedding = await WeddingsModel.findByIdAndUpdate(weddingId, {
-    cloudinaryPublicId: result.public_id,
-    listingPhotoURL: result.secure_url,
-    storyDescription: storyDescription,
-  }).lean();
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { _id: weddingId, hostId: req.user.id },
+    {
+      cloudinaryPublicId: result.public_id,
+      listingPhotoURL: result.secure_url,
+      storyDescription: storyDescription,
+      step: 2
+    }
+  ).lean();
+
+  if (!wedding) throw createHttpError(400, "Bad Request");
 
   return res.status(200).json(
     getSuccessResponse({
@@ -76,6 +83,47 @@ export const weddingInfoStep2 = asyncHandler(async (req, res) => {
         storyDescription: wedding.storyDescription,
         coupleImage: wedding.listingPhotoURL,
       },
+    })
+  );
+});
+
+export const weddingInfoStep4 = asyncHandler(async (req, res) => {
+  const {
+    weddingId,
+    guideFirstName,
+    guideLastName,
+    guideEmail,
+    guidePhoneNumber,
+    guideCoupleRelation,
+    guideSpokenLanguages,
+  } = req.body;
+
+  const { id } = req.user;
+
+  const ceremonyGuide = {
+    firstName: guideFirstName,
+    lastName: guideLastName,
+    email: guideEmail,
+    phoneNumber: guidePhoneNumber,
+    guideCoupleRelation: guideCoupleRelation,
+    spokenLanguages: guideSpokenLanguages,
+  };
+
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { hostId: id, _id: weddingId },
+    { ceremonyGuide, step: 4 },
+    {
+      new: true,
+    }
+  ).select("-__v");
+
+  if (!wedding) throw createHttpError(400, "Bad Request");
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding step-4 done successfully",
+      status: 200,
+      data: wedding,
     })
   );
 });

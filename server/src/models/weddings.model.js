@@ -42,7 +42,7 @@ const weddingsSchema = new mongoose.Schema({
     guideCoupleRelation: { type: String },
     spokenLanguages: [{ type: String }],
   },
-  hostId: { type: ObjectId, required: true },
+  hostId: { type: ObjectId, required: true, ref: "users" },
   status: { type: String, default: "draft" },
   step: { type: Number, default: 1 },
 });

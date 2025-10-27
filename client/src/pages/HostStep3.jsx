@@ -41,7 +41,6 @@ const HostStep3 = ({ formData, setFormData }) => {
     const updatedFormData = { ...formData, numDays, events };
     setFormData(updatedFormData);
 
-    // Optional: save to backend if needed
     try {
       const res = await fetch("http://localhost:3000/api/v1/wedding/step3", {
         method: "POST",
@@ -151,7 +150,7 @@ const HostStep3 = ({ formData, setFormData }) => {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700">
-              Description (optional)
+              Description *
             </label>
             <textarea
               value={events[i]?.description}
@@ -166,7 +165,6 @@ const HostStep3 = ({ formData, setFormData }) => {
         </div>
       ))}
 
-      {/* ✅ Next Button */}
       <div className="flex justify-end mt-10">
         <button
           onClick={handleNext}

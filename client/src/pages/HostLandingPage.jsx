@@ -17,8 +17,7 @@ const HostLandingPage = () => {
       navigate("/host/register/step1");
     }
   };
-
-  // called after successful login
+  
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setShowLogin(false);
@@ -29,7 +28,7 @@ const HostLandingPage = () => {
     <div className="w-full">
       {/* Hero Section with Background */}
       <div
-        className="relative h-[80vh] flex items-center justify-center bg-cover bg-center"
+        className="relative h-[90vh] flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
         {/* Overlay */}

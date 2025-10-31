@@ -161,8 +161,6 @@ const HostStep4 = ({ formData, setFormData }) => {
         />
       </div>
 
-      {/* Spoken Languages */}
-       {/* Spoken Languages - Dynamic */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Ceremony Guide's spoken languages <span className="text-red-500">*</span>

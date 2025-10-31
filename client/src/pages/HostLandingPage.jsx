@@ -7,18 +7,17 @@ import bgimage2 from "../assets/wedding-portrait-770x515.jpg";
 const HostLandingPage = () => {
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 🔑 Replace with your real auth
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [showLogin, setShowLogin] = useState(false);
 
   const handleRegisterClick = () => {
     if (!isLoggedIn) {
-      setShowLogin(true); // show login popup
+      setShowLogin(true); 
     } else {
-      navigate("/host/register/step1"); // navigate to registration page
+      navigate("/host/register/step1");
     }
   };
-
-  // called after successful login
+  
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setShowLogin(false);
@@ -29,7 +28,7 @@ const HostLandingPage = () => {
     <div className="w-full">
       {/* Hero Section with Background */}
       <div
-        className="relative h-[80vh] flex items-center justify-center bg-cover bg-center"
+        className="relative h-[90vh] flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
         {/* Overlay */}

@@ -135,7 +135,7 @@ export const authGoogle = asyncHandler(async (req, res) => {
     maxAge: JWT_REFRESH_EXPIRE_TIME * 24 * 60 * 60 * 1000,
   });
 
-  res.redirect(`https://ailimbaliya77.github.io/MyWeddingTour/#/host/register/step1?accessToken=${accessToken}`);
+  res.redirect(`http://localhost:5173/MyWeddingTour/#/host/register/step1?accessToken=${accessToken}`);
 });
 
 export const issueAccessToken = asyncHandler(async (req, res) => {

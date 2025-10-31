@@ -127,3 +127,15 @@ export const weddingInfoStep4 = asyncHandler(async (req, res) => {
     })
   );
 });
+
+export const allWeddings = asyncHandler(async (req, res) => {
+  const weddings = await WeddingsModel.find({ isDeleted: false }).select("bride groom weddingStartDate weddingEndDate").lean();
+
+  res.json(
+    getSuccessResponse({
+      message: "Weddings retrieved successfully",
+      status: 200,
+      data: weddings
+    })
+  )
+})

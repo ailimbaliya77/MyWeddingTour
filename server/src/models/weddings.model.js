@@ -27,7 +27,7 @@ const weddingsSchema = new mongoose.Schema({
   isAlcoholAvailable: { type: Boolean, default: false },
   mainLanguagesOfWedding: [{ type: String }],
   weddingStartDate: { type: Date, default: null },
-  weddingStartDate: { type: Date, default: null },
+  weddingEndDate: { type: Date, default: null },
   country: { type: String, default: null },
   region: { type: String, default: null },
   city: { type: String, default: null },
@@ -45,6 +45,8 @@ const weddingsSchema = new mongoose.Schema({
   hostId: { type: ObjectId, required: true, ref: "users" },
   status: { type: String, default: "draft" },
   step: { type: Number, default: 1 },
+  isDeleted: { type: Boolean, default: false},
+  deletedAt: { type: Date, default: null },
 });
 
 export const WeddingsModel = mongoose.model("weddings", weddingsSchema);

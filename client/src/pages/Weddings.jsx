@@ -8,9 +8,12 @@ const Weddings = () => {
   useEffect(() => {
     const fetchWeddings = async () => {
       try {
-        const res = await fetch("backend url"); 
+        
+        const res = await fetch("http://localhost:3000/api/v1/wedding");
         const data = await res.json();
+
         setWeddings(data.weddings || []);
+
       } catch (err) {
         console.error("Failed to fetch weddings:", err);
       } finally {

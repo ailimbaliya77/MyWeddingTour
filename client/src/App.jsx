@@ -16,6 +16,7 @@ import HostStep3 from './pages/HostStep3';
 import HostStep4 from './pages/HostStep4';
 import HostStep5 from './pages/HostStep5';
 import HostStep6 from './pages/HostStep6';
+import ChatBot from './pages/ChatBot';
 import './App.css';
 
 function App() {
@@ -98,6 +99,7 @@ const removeWedding = (id) => {
           <Route path="/weddings/register/step6" element={<HostStep6 formData={formData} addWedding={addWedding} />} />
           <Route path="/weddings/:id" element={<WeddingDetailsPage weddings={weddings} />} />
         </Routes>
+        <ChatBot />
         <Login
         isOpen={loginOpen}
         onClose={() => setLoginOpen(false)}

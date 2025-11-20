@@ -6,6 +6,9 @@ import { getSuccessResponse } from "../utils/response.util.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 import createHttpError from "http-errors";
+import { EventsModel } from "../models/events.model.js";
+
+// const { ObjectId } = mongoose.Types;
 
 export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   const { id } = req.user;
@@ -14,7 +17,9 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
     id,
     { isPlanner: true },
     { new: true }
-  );
+  )
+    .select("_id")
+    .lean();
 
   if (!user) {
     throw createHttpError(400, "User not found");
@@ -23,12 +28,14 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   const { bride, groom, weddingEmail, phone, _id = null } = req.body;
 
   const wedding = await WeddingsModel.findOneAndUpdate(
-    { _id: _id || new mongoose.Types.ObjectId() },
+    { _id: _id || new mongoose.Types.ObjectId(), isDeleted: false },
     {
       bride,
       groom,
       weddingEmail,
       phoneNumber: phone,
+      hostId: id,
+      $addToSet: { completedSteps: 1 },
     },
     { upsert: true, new: true }
   ).lean();
@@ -59,12 +66,12 @@ export const weddingInfoStep2 = asyncHandler(async (req, res) => {
   fs.unlinkSync(req.file.path);
 
   const wedding = await WeddingsModel.findOneAndUpdate(
-    { _id: weddingId, hostId: req.user.id },
+    { _id: weddingId, hostId: req.user.id, isDeleted: false },
     {
       cloudinaryPublicId: result.public_id,
       listingPhotoURL: result.secure_url,
       storyDescription: storyDescription,
-      step: 2
+      $addToSet: { completedSteps: 2 },
     }
   ).lean();
 
@@ -83,6 +90,51 @@ export const weddingInfoStep2 = asyncHandler(async (req, res) => {
         storyDescription: wedding.storyDescription,
         coupleImage: wedding.listingPhotoURL,
       },
+    })
+  );
+});
+
+export const weddingInfoStep3 = asyncHandler(async (req, res) => {
+  const { weddingId, totalWeddingDays, events } = req.body;
+
+  const { id } = req.user;
+
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { hostId: id, _id: weddingId, isDeleted: false },
+    { totalWeddingDays, $addToSet: { completedSteps: 3 } },
+    { new: true }
+  ).select("-__v");
+
+  const eventIds = [];
+
+  if (!wedding) throw createHttpError(400, "Bad Request");
+
+  for (const event of events) {
+    const eventDateTime = `${event.date}T${event.time}:00`;
+    const eventObj = {
+      name: event.eventName,
+      date: new Date(eventDateTime),
+      description: event.description,
+      location: event.location,
+      day: event.day,
+    };
+
+    const dbEvent = await EventsModel.findOneAndUpdate(
+      { _id: event._id || new mongoose.Types.ObjectId(), isDeleted: false },
+      { $set: eventObj },
+      { upsert: true, new: true }
+    );
+
+    eventIds.push(dbEvent._id);
+  }
+
+  await wedding.updateOne({ $addToSet: { events: { $each: eventIds } } });
+
+  return res.status(200).json(
+    getSuccessResponse({
+      message: "Wedding step-3 done successfully",
+      status: 200,
+      data: wedding,
     })
   );
 });
@@ -110,8 +162,8 @@ export const weddingInfoStep4 = asyncHandler(async (req, res) => {
   };
 
   const wedding = await WeddingsModel.findOneAndUpdate(
-    { hostId: id, _id: weddingId },
-    { ceremonyGuide, step: 4 },
+    { hostId: id, _id: weddingId, isDeleted: false },
+    { ceremonyGuide, $addToSet: { completedSteps: 4 } },
     {
       new: true,
     }
@@ -129,13 +181,15 @@ export const weddingInfoStep4 = asyncHandler(async (req, res) => {
 });
 
 export const allWeddings = asyncHandler(async (req, res) => {
-  const weddings = await WeddingsModel.find({ isDeleted: false }).select("bride groom weddingStartDate weddingEndDate").lean();
+  const weddings = await WeddingsModel.find({ isDeleted: false })
+    .select("bride groom weddingStartDate weddingEndDate")
+    .lean();
 
   res.json(
     getSuccessResponse({
       message: "Weddings retrieved successfully",
       status: 200,
-      data: weddings
+      data: weddings,
     })
-  )
-})
+  );
+});

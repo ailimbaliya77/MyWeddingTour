@@ -44,8 +44,8 @@ const weddingsSchema = new mongoose.Schema({
   },
   hostId: { type: ObjectId, required: true, ref: "users" },
   status: { type: String, default: "draft" },
-  step: { type: Number, default: 1 },
-  isDeleted: { type: Boolean, default: false},
+  completedSteps: [{ type: Number }],
+  isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },
 });
 

@@ -6,12 +6,12 @@ function TestimonialCard({ name, location, image, quote }) {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 sm:p-5 md:p-6 flex flex-col items-center text-center sm:text-left sm:flex-row sm:items-start gap-4">
       <div className="w-20 h-20 sm:w-16 md:w-20 lg:w-24 flex-shrink-0 mb-3 sm:mb-0">
         <img 
-          src={image || "https://via.placeholder.com/100"} 
-          alt={name} 
+           src="https://placehold.co/100x100?text=Guest"  
+          alt={name}  
           className="w-full h-full object-cover rounded-full border-2 border-pink-200"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "https://via.placeholder.com/100?text=Guest";
+            e.target.src = "https://placehold.co/100x100?text=Guest" ;
           }}
         />
       </div>

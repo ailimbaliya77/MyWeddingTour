@@ -1,87 +1,182 @@
-import React, {useState, useEffect} from 'react'
-import Hero from '../components/Hero';
-import TestimonialCard from '../components/TestimonialCard';
-import { Link } from 'react-router-dom';
-import { RiNumber1 } from "react-icons/ri";
-import { RiNumber2 } from "react-icons/ri";
-import { RiNumber3 } from "react-icons/ri";
+import React, { useEffect, useRef, useState } from "react";
+import Hero from "../components/Hero";
+import TestimonialCard from "../components/TestimonialCard";
+import { Link } from "react-router-dom";
+import { RiNumber1, RiNumber2, RiNumber3 } from "react-icons/ri";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+function HomePage() {
+  const [setImagesLoaded] = useState(false);
+
+  // Refs for sections
+  const featureRef = useRef(null);
+  const howRef = useRef(null);
+  const testimonialRef = useRef(null);
+  const ctaRef = useRef(null);
+
+ useEffect(() => {
+  const ctx = gsap.context(() => {
+
+    // FEATURE SECTION
+    gsap.utils.toArray(".fade-up").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            toggleActions: "play reverse play reverse",
+          },
+        }
+      );
+    });
+
+    // HOW IT WORKS
+    gsap.utils.toArray(".step-box").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { y: 120, opacity: 0, scale: 0.95 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            toggleActions: "play reverse play reverse",
+          },
+        }
+      );
+    });
+
+    // TESTIMONIALS
+    gsap.utils.toArray(".testimonial-card").forEach((el) => {
+      gsap.fromTo(
+        el,
+        { y: 140, opacity: 0, rotateX: 6 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1.3,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            toggleActions: "play reverse play reverse",
+          },
+        }
+      );
+    });
+
+    // CTA
+    gsap.fromTo(
+      ".cta-inner",
+      { scale: 0.85, opacity: 0 },
+      {
+        scale: 1,
+        opacity: 1,
+        duration: 1.3,
+        ease: "back.out(1.5)",
+        scrollTrigger: {
+          trigger: ".cta-inner",
+          start: "top 90%",
+          toggleActions: "play reverse play reverse",
+        },
+      }
+    );
+
+  });
+
+  return () => ctx.revert();
+}, []);
 
 
-function HomePage()  {
-  const [, setImagesLoaded] = useState(false);
-
-  useEffect(() => {
-    // Mark images as loaded after component mounts
-    setImagesLoaded(true);
-  }, []);
-  
   const testimonials = [
     {
       id: 1,
       image: "https://randomuser.me/api/portraits/women/32.jpg",
-      name: 'Sarah Johnson',
-      location: 'USA',
-      quote: 'Attending an Indian wedding through MyWeddingTour was the most immersive cultural experience I\'ve ever had. The colors, music, and hospitality were incredible!'
+      name: "Sarah Johnson",
+      location: "USA",
+      quote:
+        "Attending an Indian wedding through MyWeddingTour was the most immersive cultural experience I've ever had.…",
     },
     {
       id: 2,
       image: "https://randomuser.me/api/portraits/men/54.jpg",
-      name: 'Carlos Rodriguez',
-      location: 'Spain',
-      quote: 'I was welcomed like family at the wedding. The ceremonies were fascinating and the food was amazing. Definitely a once-in-a-lifetime experience!'
+      name: "Carlos Rodriguez",
+      location: "Spain",
+      quote: "I was welcomed like family at the wedding. The ceremonies were fascinating and the food was amazing!",
     },
     {
       id: 3,
       image: "https://randomuser.me/api/portraits/women/45.jpg",
-      name: 'Yuki Tanaka',
-      location: 'Japan',
-      quote: 'Everything was perfectly organized from start to finish. I learned so much about Indian wedding traditions and made wonderful new friends.'
-    }
+      name: "Yuki Tanaka",
+      location: "Japan",
+      quote:
+        "Everything was perfectly organized from start to finish. I learned so much about Indian wedding traditions.",
+    },
   ];
 
   return (
     <div>
       <Hero />
-      <br />
-      {/* Featured Weddings Section */}
-      <section className="py-10 sm:py-16 bg-white-300">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">BEYOND TOURISM – A TRUE CULTURAL CONNECTION</h2>
-          <br />
-          <p className="bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] antialiased">Travel often shows you places, but a wedding shows you people – their values, their stories, their traditions. Indian weddings are a window into the soul of the culture, where love and heritage are celebrated together in grand style.
-          Dress the part, enjoy the feast, and lose yourself in the rhythm of music and dance. Each ritual you witness is a lesson in history, each interaction a bond with the community. It’s not just about seeing India – it’s about living it.</p>
-          <br />
-          <p className="bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] antialiased">A traditional Indian wedding is nothing short of a festival – a fusion of rituals, music, dance, and food that lasts for days. It’s where culture becomes an experience, and guests are welcomed as family.
 
-          Step into this celebration and let the colors, flavors, and sounds of India embrace you. From the joy of the wedding procession to the intimacy of sacred rituals, you’ll find yourself immersed in a cultural journey that leaves you inspired, connected, and transformed.</p>
+      {/* FEATURE SECTION */}
+      <section ref={featureRef} className="py-10 sm:py-16 bg-white-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="fade-up text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">
+            BEYOND TOURISM – A TRUE CULTURAL CONNECTION
+          </h2>
+
+          <p className="fade-up bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] mt-6">
+            Travel often shows you places, but a wedding shows you people – their values, their stories, their traditions...
+          </p>
+
+          <p className="fade-up bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] mt-6">
+            A traditional Indian wedding is nothing short of a festival – a fusion of rituals, music, dance, and food...
+          </p>
         </div>
       </section>
-      
-      {/* How It Works Section */}
-      <section className="py-10 sm:py-16">
+
+      {/* HOW IT WORKS */}
+      <section ref={howRef} className="py-10 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">How It Works</h2>
-          <p className="text-gray-600 text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base">Experience authentic Indian wedding celebrations in just a few simple steps</p>
+          <p className="text-gray-600 text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base">
+            Experience authentic Indian wedding celebrations in just a few steps
+          </p>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="text-center">
+            <div className="step-box text-center">
               <div className="bg-red-100 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-search text-red-600 text-2xl sm:text-3xl"><RiNumber1 /></i>
+                <RiNumber1 className="text-red-600 text-2xl sm:text-3xl" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800">1. Browse & Select</h3>
               <p className="text-gray-600 text-sm sm:text-base">Explore upcoming weddings and choose one that matches your travel dates and interests.</p>
             </div>
-            
-            <div className="text-center">
+
+            <div className="step-box text-center">
               <div className="bg-red-100 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-ticket-alt text-red-600 text-2xl sm:text-3xl"><RiNumber2 /></i>
+                <RiNumber2 className="text-red-600 text-2xl sm:text-3xl" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800">2. Book Your Experience</h3>
               <p className="text-gray-600 text-sm sm:text-base">Secure your spot at the wedding with our various attendance packages.</p>
             </div>
-            
-            <div className="text-center">
+
+            <div className="step-box text-center">
               <div className="bg-red-100 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-heart text-red-600 text-2xl sm:text-3xl"><RiNumber3 /></i>
+                <RiNumber3 className="text-red-600 text-2xl sm:text-3xl" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800">3. Celebrate & Enjoy</h3>
               <p className="text-gray-600 text-sm sm:text-base">Attend the wedding as a special guest and immerse yourself in the celebrations.</p>
@@ -89,42 +184,35 @@ function HomePage()  {
           </div>
         </div>
       </section>
-      
-      {/* Testimonials */}
-      <section className="py-10 sm:py-16">
+
+      {/* TESTIMONIALS */}
+      <section ref={testimonialRef} className="py-10 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800">Guest Testimonials</h2>
           <p className="text-gray-600 text-center mb-8 sm:mb-12 max-w-2xl mx-auto text-sm sm:text-base">Hear from travelers who have experienced the magic of Indian weddings through MyWeddingTour</p>
-          
+
           <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map(testimonial => (
-              <TestimonialCard 
-                key={testimonial.id}
-                image={testimonial.image}
-                name={testimonial.name}
-                location={testimonial.location}
-                quote={testimonial.quote}
-              />
+            {testimonials.map((t) => (
+              <div key={t.id} className="testimonial-card">
+                <TestimonialCard image={t.image} name={t.name} location={t.location} quote={t.quote} />
+              </div>
             ))}
           </div>
         </div>
       </section>
-      
-      {/* CTA Section */}
-      <section className="py-10 sm:py-16 bg-red-300 text-black">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Ready to Experience an Indian Wedding?</h2>
-          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto">Join us for a cultural experience like no other. Create an account now to get started!</p>
-          <Link 
-            to="/signup" 
-            className="bg-purple-500 hover:bg-red-600 text-black font-bold px-6 sm:px-8 py-3 sm:py-4 rounded text-sm sm:text-lg inline-block transition"
-          >
+
+      {/* CTA */}
+      <section ref={ctaRef} className="py-10 sm:py-16 bg-red-300 text-black">
+        <div className="cta-inner container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-bold text-2xl sm:text-3xl mb-4">Ready to Experience an Indian Wedding?</h2>
+          <p className="text-base sm:text-xl mb-6 max-w-2xl mx-auto">Join us for a cultural experience like no other. Create an account now to get started!</p>
+          <Link to="/signup" className="bg-purple-500 hover:bg-red-600 text-black font-bold px-6 sm:px-8 py-3 sm:py-4 rounded text-sm sm:text-lg inline-block transition cta-inner">
             Sign Up Now
           </Link>
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

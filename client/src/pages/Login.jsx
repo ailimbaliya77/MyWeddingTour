@@ -3,6 +3,7 @@ import { X, AlertCircle } from 'lucide-react';
 
 function Login({ isOpen, onClose, onLoginSuccess }) {
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -14,13 +15,51 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
 
   if (!isOpen) return null;
 
+  // ⭐ GOOGLE LOGIN
   const googleLogin = () => {
     window.location.href = "http://localhost:3000/api/v1/auth/google";
   };
 
-  const emailLogin = () => {
-    onLoginSuccess?.();
-  };
+  // ⭐ EMAIL LOGIN (Backend API)
+  const emailLogin = async () => {
+  const email = prompt("Enter your email:");
+  const password = prompt("Enter your password:");
+
+  if (!email || !password) {
+    alert("Email and password are required");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await fetch("http://localhost:3000/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Save tokens
+      localStorage.setItem("access-token", data.data.accessToken);
+      localStorage.setItem("refresh-token", data.data.refreshToken);
+
+      alert("Login successful!");
+      onLoginSuccess?.();
+      onClose();
+    } else {
+      alert(data.error?.message || "Login failed");
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Something went wrong during login");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -43,39 +82,20 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
             Log in or sign up
           </h1>
           <p className="text-gray-600 leading-relaxed">
-            To register a wedding, please log in to your account below. If you
-            don't have an account yet, you can sign up for MyWeddingTour using
-            the same buttons.
+            To register a wedding, please log in to your account below.
           </p>
         </div>
 
-        {/* Important Notice */}
+        {/* Notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-start space-x-3">
-            <AlertCircle
-              className="text-blue-500 mt-0.5 flex-shrink-0"
-              size={20}
-            />
+            <AlertCircle className="text-blue-500 mt-0.5" size={20} />
             <div>
               <h3 className="font-semibold text-blue-900 mb-2">
                 Important Notice
               </h3>
-              <p className="text-blue-800 text-sm leading-relaxed">
-                <span className="font-medium">
-                  Facebook login is currently unavailable.
-                </span>{" "}
-                Please use an alternative login method for now. Thank you for
-                your understanding!
-              </p>
-              <p className="text-blue-800 text-sm mt-3">
-                If you are having problems logging in, please see the{" "}
-                <a
-                  href="#"
-                  className="text-blue-600 underline hover:text-blue-700"
-                >
-                  Technical troubleshooting
-                </a>{" "}
-                section of our FAQ.
+              <p className="text-blue-800 text-sm">
+                Facebook login is currently unavailable.
               </p>
             </div>
           </div>
@@ -99,13 +119,14 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
           {/* Email Login */}
           <button
             onClick={emailLogin}
-            className="flex items-center justify-center w-full border rounded-lg py-3 hover:bg-gray-100"
+            disabled={loading}
+            className="flex items-center justify-center w-full border rounded-lg py-3 hover:bg-gray-100 disabled:opacity-50"
           >
-            📧 Continue with email
+            {loading ? "Logging in..." : "📧 Continue with email"}
           </button>
         </div>
 
-        {/* Footer section with teal background */}
+        {/* Footer */}
         <div className="mt-6 -mx-6 -mb-6 bg-orange-950 rounded-b-lg p-4">
           <div className="text-center">
             <div className="text-white text-sm opacity-90">

@@ -10,7 +10,7 @@ function Navvbar({ setLoginOpen }) {
   };
 
   return (
-    <nav class="sticky top-0 bg-[#21151c] text-white px-6 md:px-12 h-[62px] z-50 flex items-center">
+    <nav className="sticky top-0 bg-[#21151c] text-white px-6 md:px-12 h-[62px] z-50 flex items-center">
       <div className="container mx-auto flex justify-between items-center px-4 py-3">
         {/* Logo */}
         <Link to="/" className="text-xl sm:text-4xl font-bold">

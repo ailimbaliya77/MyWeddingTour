@@ -22,44 +22,42 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
 
   // ⭐ EMAIL LOGIN (Backend API)
   const emailLogin = async () => {
-  const email = prompt("Enter your email:");
-  const password = prompt("Enter your password:");
+    const email = prompt("Enter your email:");
+    const password = prompt("Enter your password:");
 
-  if (!email || !password) {
-    alert("Email and password are required");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const res = await fetch("http://localhost:3000/api/v1/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Save tokens
-      localStorage.setItem("access-token", data.data.accessToken);
-      localStorage.setItem("refresh-token", data.data.refreshToken);
-
-      alert("Login successful!");
-      onLoginSuccess?.();
-      onClose();
-    } else {
-      alert(data.error?.message || "Login failed");
+    if (!email || !password) {
+      alert("Email and password are required");
+      return;
     }
-  } catch (error) {
-    console.error("Login error:", error);
-    alert("Something went wrong during login");
-  } finally {
-    setLoading(false);
-  }
-};
 
+    try {
+      setLoading(true);
+
+      const res = await fetch("http://localhost:3000/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Save token
+        localStorage.setItem("token", data.token);
+
+        alert("Login successful!");
+        onLoginSuccess?.();
+        onClose(); // close modal
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong during login");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

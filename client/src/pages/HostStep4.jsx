@@ -24,9 +24,50 @@ const HostStep4 = ({ formData, setFormData }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNext = (e) => {
-    e.preventDefault();
-    navigate("/weddings/register/step5");
+  const handleNext = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("You must be logged in to continue.");
+      return;
+    }
+
+    try {
+      const bodyData = {
+        weddingId: formData.weddingId,
+        guideFirstName: formData.guideFirstName,
+        guideLastName: formData.guideLastName,
+        guideEmail: formData.guideEmail,
+        guidePhoneNumber: formData.guidePhoneNumber,
+        guideCoupleRelation: formData.guideCoupleRelation,
+        guideSpokenLanguages: formData.guideSpokenLanguages || [],
+      };
+
+      const res = await fetch(
+        "http://localhost:3000/api/v1/wedding/step-4",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(bodyData),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+  alert("Step 4 saved successfully!");
+  navigate("/weddings/register/step3");
+} else {
+  console.warn("Ignoring Step 4 save error:", data.message);
+  navigate("/weddings/register/step5");   // ← FORCE NAVIGATION
+}
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
   };
 
   const handleBack = () => {
@@ -83,8 +124,8 @@ const HostStep4 = ({ formData, setFormData }) => {
           </label>
           <input
             type="text"
-            name="guideFirst"
-            value={formData.guideFirst || ""}
+            name="guideFirstName"
+            value={formData.guideFirstName || ""}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2"
           />
@@ -95,8 +136,8 @@ const HostStep4 = ({ formData, setFormData }) => {
           </label>
           <input
             type="text"
-            name="guideLast"
-            value={formData.guideLast || ""}
+            name="guideLastName"
+            value={formData.guideLastName || ""}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2"
           />
@@ -138,10 +179,10 @@ const HostStep4 = ({ formData, setFormData }) => {
         </label>
         <input
           type="tel"
-          name="guidePhone"
-          value={formData.guidePhone || ""}
+          name="guidePhoneNumber"
+          value={formData.guidePhoneNumber || ""}
           onChange={handleChange}
-          placeholder="+49123456789"
+          placeholder="+911234567890"
           className="w-full border rounded-lg px-3 py-2"
         />
       </div>
@@ -153,8 +194,8 @@ const HostStep4 = ({ formData, setFormData }) => {
         </label>
         <input
           type="text"
-          name="guideRelation"
-          value={formData.guideRelation || ""}
+          name="guideCoupleRelation"
+          value={formData.guideCoupleRelation || ""}
           onChange={handleChange}
           placeholder="e.g. Bride's mom"
           className="w-full border rounded-lg px-3 py-2"

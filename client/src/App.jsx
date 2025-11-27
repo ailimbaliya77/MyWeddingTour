@@ -24,6 +24,7 @@ import HostStep6 from './pages/HostStep6';
 
 import ChatBot from './pages/ChatBot';
 import ProtectedRoute from './components/protectedRoute';
+import OAuthSuccess from './pages/OAuthSuccess';
 
 import './App.css';
 
@@ -31,27 +32,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 function App() {
 
-useEffect(() => {
+  const [googleLoginInProgress, setGoogleLoginInProgress] = useState(false);
 
-  const hash = window.location.hash; 
-
-  const queryString = hash.split("?")[1]; 
-  if (!queryString) return;
-
-  const params = new URLSearchParams(queryString);
-  const token = params.get("token") || params.get("accessToken");
-
-  if (token) {
-    localStorage.setItem("token", token);
-    console.log("SAVED TOKEN:", token);
-
-    window.location.hash = "/host/register/step1";
-  }
-}, []);
-
-
-
-  //  LENIS SMOOTH SCROLL
+//  LENIS SMOOTH SCROLL
   useEffect(() => {
     const lenis = new Lenis({
       smooth: true,
@@ -100,12 +83,11 @@ useEffect(() => {
   };
 
   const [formData, setFormData] = useState({
-    brideFirst: '',
-    brideLast: '',
-    groomFirst: '',
-    groomLast: '',
-    email: '',
-    phone: '',
+    bride: { firstName: "", lastName: "" },
+    groom: { firstName: "", lastName: "" },
+    weddingEmail: "",
+    phone: "",
+    weddingId: "",
     date: '',
     location: '',
     venue: '',
@@ -148,22 +130,12 @@ useEffect(() => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/BecomeHost" element={<HostLandingPage />} />
 
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
+
           <Route path="/weddings" element={<Weddings weddings={weddings} removeWedding={removeWedding} />} />
           <Route path="/weddings/:id" element={<WeddingDetailsPage weddings={weddings} />} />
-
-          {/* ================================
-                PROTECTED STEP ROUTES
-          ================================= */}
-
-          <Route
-            path="/host/register/step1"
-            element={
-              <ProtectedRoute openLogin={setLoginOpen}>
-                <HostStep1 formData={formData} setFormData={setFormData} />
-              </ProtectedRoute>
-            }
-          />
-
+          <Route path="/host/register/step1" element={<ProtectedRoute openLogin={setLoginOpen} googleLoginInProgress={googleLoginInProgress} >
+          <HostStep1 formData={formData} setFormData={setFormData} /> </ProtectedRoute> }/>
           <Route
             path="/weddings/register/step2"
             element={
@@ -217,11 +189,10 @@ useEffect(() => {
           isOpen={loginOpen}
           onClose={() => setLoginOpen(false)}
           onLoginSuccess={() => {
-            setLoginOpen(false);
-            alert("Logged in successfully!");
-          }}
-        />
-
+          setLoginOpen(false);
+          alert("Logged in successfully!");
+  }}
+  setGoogleLoginInProgress={setGoogleLoginInProgress}/>
         <Footerr />
       </div>
     </HashRouter>

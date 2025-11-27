@@ -140,11 +140,11 @@ function HomePage() {
           </h2>
 
           <p className="fade-up bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] mt-6">
-            Travel often shows you places, but a wedding shows you people – their values, their stories, their traditions...
-          </p>
+            
+Travel often shows you places, but a wedding shows you people – their values, their stories, their traditions. Indian weddings are a window into the soul of the culture, where love and heritage are celebrated together in grand style. Dress the part, enjoy the feast, and lose yourself in the rhythm of music and dance. Each ritual you witness is a lesson in history, each interaction a bond with the community. It’s not just about seeing India – it’s about living it.</p>
 
           <p className="fade-up bg-white text-black font-roboto text-[18px] leading-[1.5] tracking-[0.4px] mt-6">
-            A traditional Indian wedding is nothing short of a festival – a fusion of rituals, music, dance, and food...
+            A traditional Indian wedding is nothing short of a festival – a fusion of rituals, music, dance, and food that lasts for days. It’s where culture becomes an experience, and guests are welcomed as family. Step into this celebration and let the colors, flavors, and sounds of India embrace you. From the joy of the wedding procession to the intimacy of sacred rituals, you’ll find yourself immersed in a cultural journey that leaves you inspired, connected, and transformed.
           </p>
         </div>
       </section>

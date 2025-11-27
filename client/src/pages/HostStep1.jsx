@@ -5,18 +5,6 @@ const HostStep1 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
   const [role, setRole] = useState(formData.role || "Bride");
 
-  const [parent, child] = name.split(".");
-
-  setFormData({
-      ...formData,
-      [parent]: {
-        ...formData[parent],
-        [child]: value,
-      },
-    });
-  };
-
-  // Auto-label based on role
   const getLabels = () => {
     if (role === "Bride") {
       return {
@@ -36,56 +24,14 @@ const HostStep1 = ({ formData, setFormData }) => {
     }
   };
 
-
-  
   const labels = getLabels();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-   const handleNext = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("You must be logged in to continue.");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:3000/api/v1/wedding/step-1", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          bride: {
-            firstName: formData.bride.firstName,
-            lastName: formData.bride.lastName,
-          },
-          groom: {
-            firstName: formData.groom.firstName,
-            lastName: formData.groom.lastName,
-          },
-          weddingEmail: formData.weddingEmail,
-          phone: formData.phone,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setFormData({ ...formData, weddingId: data.weddingId });
-        alert("Step 1 saved!");
-        navigate("/weddings/register/step2");
-      } else {
-        alert(data.message || "Failed to save data");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
-    }
+  const handleNext = () => {
+    navigate("/weddings/register/step2");
   };
 
   return (
@@ -170,7 +116,9 @@ const HostStep1 = ({ formData, setFormData }) => {
             value={formData.yourEmail || ""}
             onChange={handleChange}
             className="w-full border rounded-lg px-3 py-2 bg-black-100"
+            disabled
           />
+          <p className="text-xs text-black-500">Email cannot be changed.</p>
         </div>
 
         {/* YOU – Phone */}
@@ -265,7 +213,7 @@ const HostStep1 = ({ formData, setFormData }) => {
         </button>
       </div>
 
-    </div> 
+    </div>
   );
 };
 

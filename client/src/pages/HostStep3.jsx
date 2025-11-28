@@ -106,6 +106,8 @@ const HostStep3 = ({ formData, setFormData }) => {
           <option value={1}>1 Day</option>
           <option value={2}>2 Days</option>
           <option value={3}>3 Days</option>
+          <option value={4}>4 Days</option>
+          <option value={5}>5 Days</option>
         </select>
         </label>
         
@@ -143,7 +145,7 @@ const HostStep3 = ({ formData, setFormData }) => {
                   className="bg-white border border-black-200 p-6 rounded-xl shadow-sm mb-6"
                 >
                   <h4 className="text-lg font-semibold text-pink-700 mb-4">
-                    Function for Day {dayNumber}
+                    Events for Day {dayNumber}
                   </h4>
 
                   {/* Event Name */}

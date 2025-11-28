@@ -1,140 +1,176 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const HostStep6 = ({ formData, addWedding }) => {
+export default function HostStep6({ formData }) {
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate("/weddings/register/step5");
+  // Redirect user to final weddings page and save data
+  const handleSubmitWedding = () => {
+    localStorage.setItem("finalWeddingData", JSON.stringify(formData));
+    navigate("/weddings"); // Final redirect
   };
 
-  const handleConfirm = () => {
-    addWedding(formData); // save wedding into weddings list
-    navigate("/weddings"); // redirect to weddings page
-  };
+  const goTo = (step) => navigate(`/weddings/register/step${step}`);
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6 bg-white shadow-lg rounded-lg">
-      {/* Header */}
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">
-        HI {formData.brideFirst || "HOST"}, LET’S REVIEW YOUR DETAILS
-      </h2>
-      <p className="text-sm text-gray-500 mb-6">
-        <span className="font-bold text-teal-600">STEP 6</span> Overview & Confirmation
-      </p>
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 py-12 px-4">
+      <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-10">
 
-      {/* Section 1: Bride & Groom */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">👰 Bride Information</h3>
-        <p><b>First Name:</b> {formData.brideFirst || "N/A"}</p>
-        <p><b>Last Name:</b> {formData.brideLast || "N/A"}</p>
+        {/* HEADER */}
+        <h1 className="text-3xl font-bold mb-2">Review your wedding details</h1>
+        <p className="text-gray-600 mb-10">Step 6 • Summary</p>
 
-        <h3 className="text-lg font-semibold text-teal-700 mt-4 mb-2">🤵 Groom Information</h3>
-        <p><b>First Name:</b> {formData.groomFirst || "N/A"}</p>
-        <p><b>Last Name:</b> {formData.groomLast || "N/A"}</p>
-      </div>
+        {/* ──────────────────────────────
+            COUPLE DETAILS
+        ────────────────────────────── */}
+        <section className="mb-10 border rounded-xl p-6 bg-gray-50">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Couple Details</h2>
+            <button className="text-teal-600 hover:underline" onClick={() => goTo(1)}>
+              Edit
+            </button>
+          </div>
 
-      {/* Section 2: Contact */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">📞 Contact Details</h3>
-        <p><b>Email:</b> {formData.email || "N/A"}</p>
-        <p><b>Phone:</b> {formData.phone || "N/A"}</p>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500">Bride</p>
+              <p className="font-medium">{formData?.bride?.firstName} {formData?.bride?.lastName}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Groom</p>
+              <p className="font-medium">{formData?.groom?.firstName} {formData?.groom?.lastName}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Email</p>
+              <p className="font-medium">{formData?.bride?.email}</p>
+            </div>
+            <div>
+              <p className="text-gray-500">Phone</p>
+              <p className="font-medium">{formData?.bride?.phone}</p>
+            </div>
+          </div>
+        </section>
 
-      {/* Section 3: About Yourselves */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">💍 About Yourselves</h3>
-        {formData.image && (
-          <img
-            src={formData.image}
-            alt="Wedding couple"
-            className="w-48 h-48 rounded-lg object-cover mb-3"
-          />
-        )}
-        <p><b>Your Story:</b> {formData.story || "N/A"}</p>
-        <p><b>Engagement Video:</b> {formData.videoLink || "N/A"}</p>
-      </div>
+        {/* ──────────────────────────────
+            LOVE STORY + IMAGE
+        ────────────────────────────── */}
+        <section className="mb-10 border rounded-xl p-6 bg-gray-50">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Your Story & Photo</h2>
+            <button className="text-teal-600 hover:underline" onClick={() => goTo(2)}>
+              Edit
+            </button>
+          </div>
 
-      {/* Section 4: Wedding Details */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">📅 Wedding Details</h3>
-        <p><b>Days:</b> {formData.days || "N/A"}</p>
-        <p><b>Food:</b> {formData.food || "N/A"}</p>
-        <p><b>Alcohol:</b> {formData.alcohol || "N/A"}</p>
-        <p>
-          <b>Languages:</b>{" "}
-          {Array.isArray(formData.languages)
-            ? formData.languages.join(", ")
-            : formData.languages || "N/A"}
-        </p>
-        <p><b>Location:</b> {formData.location || "N/A"}, {formData.city || ""}, {formData.country || ""}</p>
-        <p><b>Venue:</b> {formData.venue || "N/A"}</p>
+          {formData.couplePhoto && (
+            <img
+              src={URL.createObjectURL(formData.couplePhoto)}
+              alt="Couple"
+              className="w-full rounded-xl mb-6 shadow-md"
+            />
+          )}
 
-        {formData.events &&
-          Array.isArray(formData.events) &&
-          formData.events.map((event, index) => (
-            <div key={index} className="p-3 border rounded-lg mt-2 bg-gray-50">
-              <p><b>Event {index + 1}:</b> {event.name || "N/A"}</p>
-              <p><b>Description:</b> {event.description || "N/A"}</p>
-              <p><b>Dress Code:</b> {event.dressCode || "N/A"}</p>
-              <p><b>Music/Dance:</b> {event.music ? "Yes" : "No"}</p>
+          <p className="text-gray-500 mb-1 font-semibold">Love Story</p>
+          <p className="text-gray-800 whitespace-pre-line">
+            {formData.storyDescription}
+          </p>
+
+          {formData.youtube && (
+            <div className="mt-4">
+              <p className="font-semibold text-gray-600 mb-1">YouTube Video:</p>
+              <a href={formData.youtube} target="_blank" className="text-blue-600 underline">
+                {formData.youtube}
+              </a>
+            </div>
+          )}
+        </section>
+
+        {/* ──────────────────────────────
+            WEDDING EVENTS
+        ────────────────────────────── */}
+        <section className="mb-10 border rounded-xl p-6 bg-gray-50">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Wedding Events</h2>
+            <button className="text-teal-600 hover:underline" onClick={() => goTo(3)}>
+              Edit
+            </button>
+          </div>
+
+          {formData.events?.map((ev, i) => (
+            <div key={i} className="border-b last:border-none pb-6 mb-6">
+              <h3 className="font-semibold text-lg text-teal-700">
+                Day {ev.day}: {ev.eventName}
+              </h3>
+
+              <p className="text-gray-600 mt-2">
+                <span className="font-semibold">Date:</span> {ev.startDate}
+              </p>
+
+              <p className="text-gray-600">
+                <span className="font-semibold">Time:</span> {ev.startTime}
+              </p>
+
+              <p className="text-gray-700 mt-3 whitespace-pre-line">
+                {ev.description}
+              </p>
+
+              <p className="text-gray-700 mt-2">
+                <span className="font-semibold">Food Type:</span> {ev.foodType}
+              </p>
+
+              <p className="text-gray-700">
+                <span className="font-semibold">Music:</span>{" "}
+                {ev.musicAvailable ? "Yes" : "No"}
+              </p>
+
+              <p className="text-gray-700 mt-2">
+                <span className="font-semibold">Venue:</span> {ev.venueName}
+              </p>
+
+              <div className="mt-3">
+                <p className="font-semibold text-gray-600">Location:</p>
+                <p className="text-gray-700">
+                  {ev.location.street} {ev.location.houseNumber}, {ev.location.city},{" "}
+                  {ev.location.region}, {ev.location.country} - {ev.location.postalCode}
+                </p>
+              </div>
             </div>
           ))}
-      </div>
+        </section>
 
-      {/* Section 5: Ceremony Guide */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">🎤 Ceremony Guide</h3>
-        <p><b>Name:</b> {formData.guideFirst || ""} {formData.guideLast || ""}</p>
-        <p><b>Email:</b> {formData.guideEmail || "N/A"}</p>
-        <p><b>Phone:</b> {formData.guidePhone || "N/A"}</p>
-        <p><b>Relation:</b> {formData.guideRelation || "N/A"}</p>
-        <p>
-          <b>Languages:</b>{" "}
-          {Array.isArray(formData.guideLanguages)
-            ? formData.guideLanguages.join(", ")
-            : formData.guideLanguages || "N/A"}
-        </p>
-      </div>
+        {/* ──────────────────────────────
+            WEDDING DETAILS (Step 4 & 5)
+            You can add more fields later
+        ────────────────────────────── */}
+        <section className="mb-10 border rounded-xl p-6 bg-gray-50">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Wedding Details</h2>
+            <button className="text-teal-600 hover:underline" onClick={() => goTo(4)}>
+              Edit
+            </button>
+          </div>
 
-      {/* Section 6: Payment Details */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-teal-700 mb-2">💳 Payment Details</h3>
-        <p><b>Method:</b> {formData.paymentMethod || "N/A"}</p>
-        {formData.paymentMethod === "PayPal" && (
-          <p><b>PayPal Email:</b> {formData.paypalEmail}</p>
-        )}
-        {formData.paymentMethod === "GooglePay" && (
-          <p><b>GPay Number:</b> {formData.gpayNumber}</p>
-        )}
-        {formData.paymentMethod === "BankTransfer" && (
-          <>
-            <p><b>Bank Name:</b> {formData.bankName}</p>
-            <p><b>Account No:</b> {formData.accountNumber}</p>
-            <p><b>IFSC/SWIFT:</b> {formData.ifsc}</p>
-          </>
-        )}
-        {formData.paymentMethod === "UPI" && <p><b>UPI ID:</b> {formData.upiId}</p>}
-        {formData.paymentMethod === "Other" && <p><b>Other:</b> {formData.otherPayment}</p>}
-      </div>
+          <p className="text-gray-700">
+            <span className="font-semibold">Guest Limit:</span> {formData.guestLimit || "Not provided"}
+          </p>
 
-      {/* Buttons */}
-      <div className="flex justify-between">
-        <button
-          onClick={handleBack}
-          className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleConfirm}
-          className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-        >
-          Confirm & Submit
-        </button>
+          <p className="text-gray-700 mt-2">
+            <span className="font-semibold">Ticket Price:</span> {formData.ticketPrice || "Not provided"}
+          </p>
+        </section>
+
+        {/* ──────────────────────────────
+            SUBMIT BUTTON
+        ────────────────────────────── */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmitWedding}
+            className="px-10 py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition transform hover:scale-105 active:scale-95"
+          >
+            Submit Wedding →
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-export default HostStep6;
+}

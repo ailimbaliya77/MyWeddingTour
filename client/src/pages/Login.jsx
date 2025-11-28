@@ -43,7 +43,7 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
 
       if (res.ok) {
         // Save token
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("accessToken", data.accessToken);
 
         alert("Login successful!");
         onLoginSuccess?.();

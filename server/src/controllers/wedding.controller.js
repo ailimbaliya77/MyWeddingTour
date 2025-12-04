@@ -208,3 +208,27 @@ export const allWeddings = asyncHandler(async (req, res) => {
     })
   );
 });
+
+export const getWeddingById = async (req, res, next) => {
+  const { weddingId } = req.params;
+  const wedding = await WeddingsModel.findOne({ _id: weddingId, isDeleted: false })
+    .populate({
+      path: "events",
+      select:
+        "name description music dance date day ritualName foodType musicAvailable specialPerformance",
+    })
+    .select(
+      "-location -isDeleted -deletedAt -wEmail -cloudinaryPublicId -postalCode -ceremonyGuide -hostId -status -completedSteps -phoneNumbe0r -__v"
+    )
+    .lean();
+
+  if (!wedding) throw createHttpError(400, "Bad Request");
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding retrieved successfully",
+      status: 200,
+      data: wedding,
+    })
+  );
+};

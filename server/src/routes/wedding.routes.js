@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import {
   allWeddings,
+  getWeddingById,
   weddingInfoStep1,
   weddingInfoStep2,
   weddingInfoStep3,
@@ -44,5 +45,7 @@ weddingRouter.post(
   validate({ body: weddingInfoStep4Schema }),
   weddingInfoStep4
 );
+
+weddingRouter.get('/:weddingId', getWeddingById);
 
 export default weddingRouter;

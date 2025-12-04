@@ -116,7 +116,22 @@ export const weddingInfoStep3 = asyncHandler(async (req, res) => {
       date: new Date(eventDateTime),
       description: event.description,
       location: event.location,
+      ritualName: event.ritualName,
+      foodType: event.foodType,
+      musicAvailable: event.musicAvailable,
+      dressCode: event.dressCode,
+      venueName: event.venueName,
+      extraNotes: event.extraNotes,
+      specialPerformance: event.specialPerformance,
       day: event.day,
+      location: {
+        country: event.location.country,
+        region: event.location.region,
+        city: event.location.city,
+        postalCode: event.location.postalCode,
+        street: event.location.street,
+        houseNumber: event.location.houseNumber,
+      },
     };
 
     const dbEvent = await EventsModel.findOneAndUpdate(

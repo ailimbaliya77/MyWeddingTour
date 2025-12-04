@@ -36,7 +36,6 @@ weddingRouter.post(
 weddingRouter.post(
   "/step-3",
   authenticate,
-  validate({ body: weddingInfoStep3Schema }),
   weddingInfoStep3
 );
 weddingRouter.post(

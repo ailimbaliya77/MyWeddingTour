@@ -7,6 +7,7 @@ import {
   weddingInfoStep2,
   weddingInfoStep3,
   weddingInfoStep4,
+  weddingInfoStep5,
 } from "../controllers/wedding.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
@@ -24,14 +25,14 @@ weddingRouter.get("/", allWeddings);
 weddingRouter.post(
   "/step-1",
   authenticate,
-  validate({ body: weddingStep1Schema }),
+  // validate({ body: weddingStep1Schema }),
   weddingInfoStep1
 );
 weddingRouter.post(
   "/step-2",
   authenticate,
   upload.single("couplePhoto"),
-  validate({ body: weddingStep2Schema }),
+  // validate({ body: weddingStep2Schema }),
   weddingInfoStep2
 );
 weddingRouter.post(
@@ -44,6 +45,11 @@ weddingRouter.post(
   authenticate,
   validate({ body: weddingInfoStep4Schema }),
   weddingInfoStep4
+);
+weddingRouter.post(
+  "/step-5",
+  authenticate,
+  weddingInfoStep5
 );
 
 weddingRouter.get('/:weddingId', getWeddingById);

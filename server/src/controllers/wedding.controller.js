@@ -25,15 +25,13 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
     throw createHttpError(400, "User not found");
   }
 
-  const { bride, groom, weddingEmail, phone, _id = null } = req.body;
+  const { bride, groom, _id = null } = req.body;
 
   const wedding = await WeddingsModel.findOneAndUpdate(
     { _id: _id || new mongoose.Types.ObjectId(), isDeleted: false },
     {
       bride,
       groom,
-      weddingEmail,
-      phoneNumber: phone,
       hostId: id,
       $addToSet: { completedSteps: 1 },
     },
@@ -48,8 +46,6 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
         _id: wedding._id,
         bride: wedding.bride,
         groom: wedding.groom,
-        weddingEmail: wedding.email,
-        phoneNumber: wedding.phoneNumber,
       },
     })
   );
@@ -195,6 +191,44 @@ export const weddingInfoStep4 = asyncHandler(async (req, res) => {
   );
 });
 
+export const weddingInfoStep5 = asyncHandler(async (req, res) => {
+  const {
+    accountHolderName,
+    ifcNumber,
+    accountNumber,
+    linkedBankModileNumber,
+    weddingId,
+  } = req.body;
+
+  const { id } = req.user;
+
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { hostId: id, _id: weddingId, isDeleted: false },
+    {
+      bankDetails: {
+        accountHolderName,
+        ifcNumber,
+        accountNumber,
+        linkedBankModileNumber,
+      },
+      $addToSet: { completedSteps: 4 },
+    },
+    {
+      new: true,
+    }
+  ).select("-__v");
+
+  if (!wedding) throw createHttpError(400, "Bad Request");
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding step-5 done successfully",
+      status: 200,
+      data: wedding,
+    })
+  );
+});
+
 export const allWeddings = asyncHandler(async (req, res) => {
   const weddings = await WeddingsModel.find({ isDeleted: false })
     .select("bride groom weddingStartDate weddingEndDate")
@@ -211,7 +245,10 @@ export const allWeddings = asyncHandler(async (req, res) => {
 
 export const getWeddingById = async (req, res, next) => {
   const { weddingId } = req.params;
-  const wedding = await WeddingsModel.findOne({ _id: weddingId, isDeleted: false })
+  const wedding = await WeddingsModel.findOne({
+    _id: weddingId,
+    isDeleted: false,
+  })
     .populate({
       path: "events",
       select:

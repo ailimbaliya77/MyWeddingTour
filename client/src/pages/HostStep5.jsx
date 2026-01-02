@@ -4,9 +4,59 @@ import { useNavigate } from "react-router-dom";
 const HostStep5 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
 
-const handleNext = () => {
-  navigate("/weddings/register/step6"); 
+const handleNext = async () => {
+  if (!formData.weddingId) {
+    alert("Wedding ID missing. Please restart the process.");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Login required");
+    navigate("/");
+    return;
+  }
+
+  try {
+    const payload = {
+      weddingId: formData.weddingId,
+      accountHolderName: formData.bankName || "",
+      ifscNumber: formData.ifsc || "",
+      accountNumber: formData.accountNumber || "",
+      linkedBankMobileNumber:
+        formData.gpayNumber ||
+        formData.linkedBankMobileNumber ||
+        ""
+    };
+
+    const res = await fetch(
+      "http://localhost:3000/api/v1/wedding/step-5",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Step 5 failed");
+      return;
+    }
+
+    // ✅ success → move to Step-6
+    navigate("/weddings/register/step6");
+  } catch (error) {
+    console.error("Step 5 error:", error);
+    alert("Something went wrong while saving payment details");
+  }
 };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

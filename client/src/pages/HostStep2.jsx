@@ -6,9 +6,6 @@ const HostStep2 = ({ formData, setFormData }) => {
 
   const [errors, setErrors] = useState({});
 
-  // ----------------------------
-  // VALIDATION
-  // ----------------------------
   const validateStep2 = () => {
     const newErrors = {};
 
@@ -24,9 +21,6 @@ const HostStep2 = ({ formData, setFormData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ----------------------------
-  // PHOTO UPLOAD HANDLER
-  // ----------------------------
   const handlePhotoUpload = (file) => {
     if (!file) return;
 
@@ -49,9 +43,6 @@ const HostStep2 = ({ formData, setFormData }) => {
     setErrors((prev) => ({ ...prev, couplePhoto: "" }));
   };
 
-  // ----------------------------
-  // TEXT CHANGE HANDLER
-  // ----------------------------
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -59,49 +50,48 @@ const HostStep2 = ({ formData, setFormData }) => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // ----------------------------
-  // SEND DATA → BACKEND
-  // ----------------------------
   const handleNext = async () => {
-    if (!validateStep2()) {
-      alert("Please fix required fields before continuing");
+  if (!validateStep2()) {
+    alert("Please fix errors before continuing");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Login required");
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("weddingId", formData.weddingId);
+  fd.append("couplePhoto", formData.couplePhoto);
+  fd.append("storyDescription", formData.storyDescription);
+  fd.append("youtube", formData.youtube || "");
+
+  try {
+    const res = await fetch("http://localhost:3000/api/v1/wedding/step-2", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: fd,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Step 2 failed");
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must be logged in.");
-      return;
-    }
+    navigate("/weddings/register/step3");
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
+  }
+};
 
-    try {
-      const fd = new FormData();
-      fd.append("weddingId", formData.weddingId);
-      fd.append("couplePhoto", formData.couplePhoto);
-      fd.append("storyDescription", formData.storyDescription);
-      fd.append("youtube", formData.youtube || "");
-
-      const res = await fetch("http://localhost:3000/api/v1/wedding/step-2", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Step 2 saved successfully!");
-        localStorage.setItem("step2Complete", "true");
-        navigate("/weddings/register/step3");
-      } else {
-        console.warn("Ignoring backend error:", data.message);
-        navigate("/weddings/register/step3"); // still continue
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong during upload.");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 py-12 px-4">

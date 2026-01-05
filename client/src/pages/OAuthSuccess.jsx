@@ -6,17 +6,14 @@ const OAuthSuccess = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Get the access token from URL query params
+  
     const urlParams = new URLSearchParams(location.search);
     const accessToken = urlParams.get('accessToken');
 
     if (accessToken) {
-      // Store the access token in localStorage
+      
       localStorage.setItem('token', accessToken);
       localStorage.setItem('accessToken', accessToken);
-      
-      // Optional: Fetch user profile data with the token
-      fetchUserProfile(accessToken);
 
       // Redirect to Step 1 registration page
       setTimeout(() => {
@@ -32,7 +29,7 @@ const OAuthSuccess = () => {
   }, [navigate, location]);
 
   // Fetch user profile from backend
-  const fetchUserProfile = async (token) => {
+  /* const fetchUserProfile = async (token) => {
     try {
       const response = await fetch('http://localhost:3000/api/v1/auth/login', {
         method: 'GET',
@@ -60,7 +57,7 @@ const OAuthSuccess = () => {
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
-  };
+  }; */
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50">

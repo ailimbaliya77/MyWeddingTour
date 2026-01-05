@@ -1,29 +1,39 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
+import { RiStarFill } from "react-icons/ri";
 
-function TestimonialCard({ name, location, image, quote }) {
-    
+function TestimonialCard({ image, name, location, quote, ctaText, ctaLink }) {
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 sm:p-5 md:p-6 flex flex-col items-center text-center sm:text-left sm:flex-row sm:items-start gap-4">
-      <div className="w-20 h-20 sm:w-16 md:w-20 lg:w-24 flex-shrink-0 mb-3 sm:mb-0">
+    <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-red-100 h-full flex flex-col">
+      <div className="flex items-center mb-6">
         <img 
-           src="https://placehold.co/100x100?text=Guest"  
-          alt={name}  
-          className="w-full h-full object-cover rounded-full border-2 border-pink-200"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "https://placehold.co/100x100?text=Guest" ;
-          }}
+          src={image} 
+          alt={name} 
+          className="w-16 h-16 rounded-full object-cover border-2 border-red-200"
         />
+        <div className="ml-4">
+          <h3 className="font-bold text-lg text-gray-800">{name}</h3>
+          <p className="text-gray-600 text-sm">{location}</p>
+          <div className="flex mt-1">
+            {[...Array(5)].map((_, i) => (
+              <RiStarFill key={i} className="text-yellow-400 text-sm" />
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="flex-1">
-        <div className="text-pink-600 text-lg sm:text-xl font-semibold mb-1">{name || "Guest Name"}</div>
-        <div className="text-gray-500 text-sm mb-2 sm:mb-3">{location || "Country"}</div>
-        <p className="text-gray-700 text-sm sm:text-base italic">
-          {quote || "This wedding experience was truly magical. The traditions, colors, and celebrations were beyond anything I could have imagined!"}
-        </p>
-      </div>
+      
+      <p className="text-gray-700 mb-6 flex-grow italic">"{quote}"</p>
+      
+      {ctaText && ctaLink && (
+        <Link 
+          to={ctaLink}
+          className="mt-auto inline-flex items-center gap-2 text-red-600 font-semibold hover:text-red-700 text-sm border-t border-gray-100 pt-4"
+        >
+          {ctaText} →
+        </Link>
+      )}
     </div>
-  )
+  );
 }
 
-export default TestimonialCard
+export default TestimonialCard;

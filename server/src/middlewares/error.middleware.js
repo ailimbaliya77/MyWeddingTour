@@ -46,6 +46,7 @@ export const jwtHandler = (err, _req, _res, next) => {
   next(err)
 }
 
-export const notFoundHandler = (_req, _res, next) => {
+export const notFoundHandler = (req, _res, next) => {
+  console.log("route not found==>", req.method, req.originalUrl)
   return next(createHttpError(404, "Route not found"));
 };

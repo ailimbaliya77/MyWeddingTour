@@ -231,7 +231,7 @@ export const weddingInfoStep5 = asyncHandler(async (req, res) => {
 
 export const allWeddings = asyncHandler(async (req, res) => {
   const weddings = await WeddingsModel.find({ isDeleted: false })
-    .select("bride groom weddingStartDate weddingEndDate")
+    .select("bride groom weddingStartDate weddingEndDate listingPhotoURL")
     .lean();
 
   res.json(

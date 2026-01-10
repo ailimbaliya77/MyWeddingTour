@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import Navvbar from "../pages/Navvbar"
 import Hero from "../components/Hero";
 import TestimonialCard from "../components/TestimonialCard";
+import WeddingCard from "../components/weddingCardHomepage";
 import { Link } from "react-router-dom";
 import { RiNumber1, RiNumber2, RiNumber3, RiCalendarEventLine, RiMapPinLine, RiStarFill, RiArrowRightLine } from "react-icons/ri";
 import { FaGlassCheers, FaHandsHelping, FaPalette, FaMusic, FaUtensils } from "react-icons/fa";
@@ -10,7 +12,31 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 function HomePage() {
-  const [setImagesLoaded] = useState(false);
+
+  const [featuredWeddings, setFeaturedWeddings] = useState([]);
+const [loadingWeddings, setLoadingWeddings] = useState(true);
+
+useEffect(() => {
+  const fetchWeddings = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/v1/wedding");
+      const data = await res.json();
+
+      if (res.ok) {
+        setFeaturedWeddings((data.data || []).slice(0, 3));
+      }
+    } catch (err) {
+      console.error("Error fetching weddings", err);
+    } finally {
+      setLoadingWeddings(false);
+    }
+  };
+
+  fetchWeddings();
+}, []);
+
+
+  const [setLoginOpen] = useState(false);
 
   // Refs for sections
   const featureRef = useRef(null);
@@ -63,25 +89,35 @@ function HomePage() {
         );
       });
 
-      // WEDDING TYPES - floating animation
-      gsap.utils.toArray(".wedding-type-card").forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { y: 100, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.1,
-            delay: i * 0.15,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              toggleActions: "play reverse play reverse",
-            },
-          }
-        );
-      });
+      // WEDDING TYPES – step-by-step floating cards
+      const weddingCards = gsap.utils.toArray(".wedding-type-card");
+
+      gsap.fromTo(
+        weddingCards,
+        {
+          y: 120,
+          opacity: 0,
+          scale: 0.95,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          stagger: {
+            each: 0.25,
+          },
+          scrollTrigger: {
+            trigger: ".wedding-types-wrapper",
+            start: "top 75%",
+            end: "bottom 60%",
+            scrub: false,
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+
 
       // TESTIMONIALS - enhanced animation
       gsap.utils.toArray(".testimonial-card").forEach((el, i) => {
@@ -176,7 +212,7 @@ function HomePage() {
     },
   ];
 
-  const weddingTypes = [
+  /* const weddingTypes = [
     {
       id: 1,
       title: "Grand North Indian Wedding",
@@ -204,7 +240,7 @@ function HomePage() {
       bestFor: "Younger travelers",
       cta: "Explore Destination Weddings"
     }
-  ];
+  ]; */
 
   const features = [
     {
@@ -247,7 +283,13 @@ function HomePage() {
 
   return (
     <div className="overflow-hidden">
+      <div className="relative">
+      {/* Hero Background */}
       <Hero />
+
+      {/* Navbar OVER Hero */}
+      <Navvbar setLoginOpen={setLoginOpen} />
+    </div>
 
       {/* FEATURE CARDS SECTION */}
       <section ref={featureRef} className="py-16 bg-gradient-to-b from-white to-red-50">
@@ -342,33 +384,25 @@ function HomePage() {
             Discover different wedding styles across India's diverse regions
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {weddingTypes.map((type) => (
-              <div key={type.id} className="wedding-type-card bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6 text-white">
-                  <div className="text-4xl mb-4">{type.icon}</div>
-                  <h3 className="text-2xl font-bold">{type.title}</h3>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
-                      {type.duration}
-                    </span>
-                    <span className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-semibold">
-                      {type.bestFor}
-                    </span>
-                  </div>
-                  <p className="text-gray-700 mb-6">{type.highlight}</p>
-                  <Link 
-                    to={`/weddings?type=${type.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="block w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    {type.cta}
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+              {loadingWeddings ? (
+      <p className="text-center text-gray-500">Loading weddings…</p>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 wedding-types-wrapper">
+        {featuredWeddings.map((wedding) => (
+          <WeddingCard key={wedding._id} wedding={wedding} />
+        ))}
+      </div>
+    )}
+
+    <div className="text-center mt-14">
+      <Link
+        to="/weddings"
+        className="inline-block border border-red-500 text-red-600 px-8 py-4 rounded-full font-semibold hover:bg-red-50 transition"
+      >
+        Explore All Weddings
+      </Link>
+    </div>
+
         </div>
       </section>
 
@@ -433,7 +467,7 @@ function HomePage() {
               to="/faq" 
               className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
-              📊 Compare All Package Options
+              📊 Read more FAQ's
             </Link>
           </div>
         </div>
@@ -455,10 +489,10 @@ function HomePage() {
               🎫 Find Your Wedding Invitation
             </Link>
             <Link 
-              to="/host" 
+              to="/BecomeHost" 
               className="bg-transparent hover:bg-white/20 border-2 border-white text-white font-bold px-10 py-5 rounded-full text-lg shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3"
             >
-              💸 Start Hosting & Earning
+              💸 Start Hosting
             </Link>
           </div>
           

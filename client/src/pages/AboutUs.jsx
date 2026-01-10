@@ -5,8 +5,8 @@ function AboutUs()  {
   return (
     <div>
       {/* Our Story */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-        <div className="flex flex-col lg:flex-row items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 pt-36">
+        <div className="flex flex-col lg:flex-row pt-12 items-center">
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0 lg:pr-8">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 md:mb-6 text-gray-800">Our Story</h2>
             <p className="text-gray-600 mb-4 text-sm sm:text-base">MyWeddingTour began in 2025 with a simple idea: to share the rich cultural experience of Indian weddings with travelers from around the world. Our founder, Priya Sharma, recognized that while many tourists experienced India's landmarks and cuisine, few had the opportunity to witness one of the country's most spectacular cultural events—a traditional Indian wedding.</p>

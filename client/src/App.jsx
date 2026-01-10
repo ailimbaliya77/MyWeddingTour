@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Lenis from "@studio-freight/lenis";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
+import MainLayout from './components/mainLayout';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 
-import Navvbar from './pages/Navvbar';
 import Footerr from './pages/Footerr';
 import HomePage from './pages/HomePage';
 import Weddings from './pages/Weddings';
@@ -37,20 +37,20 @@ function App() {
   // Smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
+      duration: 1.2,       // smoothness
       smooth: true,
-      lerp: 0.08,
-      wheelMultiplier: 1.2,
-      gestureOrientation: "vertical",
-      normalizeWheel: true,
+      direction: "vertical",
+      gestureDirection: "vertical",
+      smoothTouch: false,  // IMPORTANT (better UX on mobile)
     });
 
     function raf(time) {
       lenis.raf(time);
+      ScrollTrigger.update(); // sync GSAP
       requestAnimationFrame(raf);
     }
 
     requestAnimationFrame(raf);
-    lenis.on("scroll", ScrollTrigger.update);
 
     return () => {
       lenis.destroy();
@@ -96,21 +96,51 @@ function App() {
     <HashRouter>
       <div className="App">
 
-        <Navvbar setLoginOpen={setLoginOpen} />
+        
 
         <Routes>
 
           {/* PUBLIC ROUTES */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/FAQ" element={<FAQ />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/BecomeHost" element={<HostLandingPage />} />
+          <Route
+        path="/"
+        element={<HomePage setLoginOpen={setLoginOpen} />}
+      />
+          <Route path="/FAQ" element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <FAQ />
+          </MainLayout>
+        } />
+          <Route path="/about-us" element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <AboutUs />
+          </MainLayout>
+        } />
+          <Route path="/contact" element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <Contact />
+          </MainLayout>
+        } />
+          <Route path="/BecomeHost" element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <HostLandingPage />
+          </MainLayout>
+        } />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
 
           {/* WEDDINGS (BACKEND DATA) */}
-          <Route path="/weddings" element={<Weddings />} />
-          <Route path="/weddings/:id" element={<WeddingDetailsPage />} />
+          <Route
+        path="/weddings"
+        element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <Weddings />
+          </MainLayout>
+        }
+      />
+          <Route path="/weddings/:weddingId" element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <WeddingDetailsPage />
+          </MainLayout>
+        } />
 
           {/* HOST REGISTRATION STEPS */}
           <Route path="/host/register/step1" element={<ProtectedRoute openLogin={setLoginOpen} googleLoginInProgress={googleLoginInProgress} >

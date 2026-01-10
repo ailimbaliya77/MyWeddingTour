@@ -1,39 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
+
 function Navvbar({ setLoginOpen }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => {
+    setScrolled(window.scrollY > 40);
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
-    <nav className="sticky top-0 bg-[#21151c] text-white px-6 md:px-12 h-[62px] z-50 flex items-center">
-      <div className="container mx-auto flex justify-between items-center px-4 py-3">
+        <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
+        ${scrolled
+          ? "bg-black/70 backdrop-blur-md shadow-sm"
+          : "bg-transparent"
+        }`}>
+
+      <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-xl sm:text-4xl font-bold">
-          <span className="text-white">My</span>
-          <span className="text-white">Wedding</span>
+          <span className="text-yellow">My</span>
+          <span className="text-yellow">Wedding</span>
           <span className="text-red-800">Tour</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8 font-semibold text-sm">
-          <Link to="/" className="hover:text-white transition">
+        <div className="hidden md:flex items-center gap-10 text-sm">
+          <Link to="/" className="text-black/80 hover:text-black transition font-bold">
             HOME
           </Link>
-          <Link to="/weddings" className="hover:text-white transition">
+          <Link to="/weddings" className="text-black/80 hover:text-black transitio font-bold">
             WEDDINGS
           </Link>
-          <Link to="/FAQ" className="hover:text-white transition">
+          <Link to="/FAQ" className="text-black/80 hover:text-black transition font-bold">
             FAQ
           </Link>
-          <Link to="/about-us" className="hover:text-white transition">
+          <Link to="/about-us" className="text-black/80 hover:text-black transition font-bold">
             ABOUT US
           </Link>
-          <Link to="/contact" className="hover:text-white transition">
+          <Link to="/contact" className="text-black/80 hover:text-black transition font-bold">
             CONTACT US
           </Link>
         </div>

@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import SplitType from "split-type";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaGlobe, FaShieldAlt, FaHeart } from "react-icons/fa";
-import img1 from "../assets/rajasthani-wedding.jpg";
+import video1 from "../assets/157657-815175893_small.mp4"
+import video2 from "../assets/189020-884234925_small.mp4"
+import video3 from "../assets/242464_small.mp4"
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,6 +17,30 @@ function Hero() {
   const ctaContainer = useRef(null);
   const trustBadges = useRef(null);
   const containerRef = useRef(null);
+
+  const videos = [video1, video2, video3];
+const videoRef = useRef(null);
+const [currentVideo, setCurrentVideo] = useState(0);
+
+useEffect(() => {
+  const video = videoRef.current;
+  if (!video) return;
+
+  const handleEnded = () => {
+    setCurrentVideo((prev) => (prev + 1) % videos.length);
+  };
+
+  video.addEventListener("ended", handleEnded);
+  return () => video.removeEventListener("ended", handleEnded);
+}, []);
+
+useEffect(() => {
+  if (videoRef.current) {
+    videoRef.current.load();
+    videoRef.current.play().catch(() => {});
+  }
+}, [currentVideo]);
+
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -28,11 +54,12 @@ function Hero() {
 
       // Cinematic background zoom-out + fade
       tl.from(bg.current, {
-        scale: 1.4,
-        opacity: 0,
-        duration: 2,
-        ease: "power3.out",
-      });
+  scale: 1.15,
+  opacity: 0,
+  duration: 2,
+  ease: "power3.out",
+});
+
 
       // Split text animation
       tl.from(
@@ -109,28 +136,32 @@ function Hero() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[100vh] min-h-[700px] max-h-[900px] flex items-center justify-center overflow-hidden"
-    >
-      {/* Background */}
-      <div
-        ref={bg}
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${img1})`,
-          filter: "brightness(0.5)",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50" />
-      </div>
+      className="relative w-full h-screen flex items-center pt-40">
 
-      {/* Content Container */}
+{/* Background Video */}
+<div ref={bg} className="absolute inset-0 overflow-hidden">
+  <video
+    ref={videoRef}
+    className="absolute inset-0 w-full h-full object-cover brightness-110 contrast-105 saturate-105"
+    autoPlay
+    muted
+    playsInline
+  >
+    <source src={videos[currentVideo]} type="video/mp4" />
+  </video>
+
+  {/* Dark cinematic overlay */}
+  <div className="absolute inset-0 bg-black/40" />
+</div>
+
+     {/* Content Container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="w-full flex flex-col items-center justify-center">
           
           {/* Title */}
           <h1
             ref={title}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight px-2"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold mb-4 sm:mb-6 text-white drop-shadow-lg tracking-tight px-2"
           >
             Don't Just See India. Live Its biggest Celebration
           </h1>
@@ -138,7 +169,7 @@ function Hero() {
           {/* Subtitle */}
           <p
             ref={paragraph}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-6 sm:mb-8 text-white/90 max-w-4xl mx-auto px-4 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-6 sm:mb-8 text-white/80 max-w-3xl mx-auto px-4 leading-relaxed"
           >
             Go Beyond The Tourist Trail. Step Inside A real Indian Wedding - An Explosion Of Colour, Emotion And Tradition, As An Honoured Guest, Not Just A Spectator.
           </p>
@@ -156,7 +187,7 @@ function Hero() {
   {/* Primary CTA - DEBUG */}
   <Link
     to="/weddings"
-    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-red-600 text-white font-bold text-lg rounded-full border-black-400 shadow-2xl z-[1000] relative border-4 "
+    className="bg-white text-black px-8 py-4 rounded-full font-semibold"
     style={{ 
       opacity: 1,
       visibility: 'visible',
@@ -168,31 +199,20 @@ function Hero() {
 
   {/* Secondary CTA - DEBUG */}
   <Link
-    to="/host"
-    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-bold text-lg rounded-full shadow-2xl z-[1000] relative border-4 border-black-400 mt-4 sm:mt-0"
+    to="/BecomeHost"
+    className="border border-white/60 text-white px-8 py-4 rounded-full"
     style={{ 
       opacity: 1,
       visibility: 'visible',
       transform: 'none' // Remove transform to debug
     }}
   >
-    🏠 Become a Host & Earn
+    🏠 Become a Host 
   </Link>
 </div>
 
-          {/* Tertiary CTA */}
-          <Link
-            to="/how-it-works"
-            className="inline-block text-white/80 hover:text-white text-base sm:text-lg font-medium mb-8 sm:mb-10 border-b border-white/30 hover:border-white transition-all duration-300"
-          >
-            ✨ See How It Works for Guests →
-          </Link>
-
           {/* Trust Badges - Responsive Grid */}
-          <div 
-            ref={trustBadges}
-            className="w-full max-w-4xl mx-auto px-2"
-          >
+          <div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <FaGlobe className="text-yellow-300 text-xl sm:text-2xl flex-shrink-0" />

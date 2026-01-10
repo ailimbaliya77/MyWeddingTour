@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL=import.meta.env.VITE_API_URL
+
 const HostStep1 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
 
@@ -101,7 +103,7 @@ const primaryPerson = role === "Bride" ? formData.bride : formData.groom;
       phone: primaryPerson.phone,
     };
 
-    const res = await fetch("http://localhost:3000/api/v1/wedding/step-1", {
+    const res = await fetch(`http://localhost:3000/api/v1/wedding/step-1`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +155,6 @@ const primaryPerson = role === "Bride" ? formData.bride : formData.groom;
         >
           <option value="Bride">Bride</option>
           <option value="Groom">Groom</option>
-          <option value="Other">Other</option>
         </select>
 
         {/* CONTACT DETAILS TITLE */}

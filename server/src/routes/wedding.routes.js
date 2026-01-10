@@ -52,6 +52,6 @@ weddingRouter.post(
   weddingInfoStep5
 );
 
-weddingRouter.get('/:weddingId', getWeddingById);
+weddingRouter.get('/:weddingId', authenticate, getWeddingById);
 
 export default weddingRouter;

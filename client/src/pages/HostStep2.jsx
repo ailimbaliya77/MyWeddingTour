@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const HostStep2 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ const HostStep2 = ({ formData, setFormData }) => {
   fd.append("youtube", formData.youtube || "");
 
   try {
-    const res = await fetch("http://localhost:3000/api/v1/wedding/step-2", {
+    const res = await fetch(`${API_URL}/wedding/step-2`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

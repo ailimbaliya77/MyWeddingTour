@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL=import.meta.env.VITE_API_URL;
 
 const HostStep5 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const handleNext = async () => {
     };
 
     const res = await fetch(
-      "http://localhost:3000/api/v1/wedding/step-5",
+      `${API_URL}/wedding/step-5`,
       {
         method: "POST",
         headers: {

@@ -13,6 +13,8 @@ import { EventsModel } from "../models/events.model.js";
 export const weddingInfoStep1 = asyncHandler(async (req, res) => {
   const { id } = req.user;
 
+  console.log("id", id)
+
   const user = await UserModel.findByIdAndUpdate(
     id,
     { isPlanner: true },
@@ -106,7 +108,8 @@ export const weddingInfoStep3 = asyncHandler(async (req, res) => {
   if (!wedding) throw createHttpError(400, "Bad Request");
 
   for (const event of events) {
-    const eventDateTime = `${event.date}T${event.time}:00`;
+    const eventDateTime = `${event.startDate}T${event.startTime}:00`;
+    console.log("event date", eventDateTime)
     const eventObj = {
       name: event.eventName,
       date: new Date(eventDateTime),
@@ -211,7 +214,7 @@ export const weddingInfoStep5 = asyncHandler(async (req, res) => {
         accountNumber,
         linkedBankModileNumber,
       },
-      $addToSet: { completedSteps: 4 },
+      $addToSet: { completedSteps: 5 },
     },
     {
       new: true,
@@ -230,9 +233,10 @@ export const weddingInfoStep5 = asyncHandler(async (req, res) => {
 });
 
 export const allWeddings = asyncHandler(async (req, res) => {
-  const weddings = await WeddingsModel.find({ isDeleted: false })
+  const weddings = await WeddingsModel.find({ isDeleted: false, status: "pending"  })
     .select("bride groom weddingStartDate weddingEndDate listingPhotoURL")
-    .lean();
+    .lean()
+    .sort("-_id");
 
   res.json(
     getSuccessResponse({

@@ -37,7 +37,7 @@ export const jwtHandler = (err, _req, _res, next) => {
     const formattedError = {
       message: "Invalid or expired token",
       status: 403,
-      type: "Token velidation error",
+      type: "Token validation error",
     }
 
     return next(formattedError);

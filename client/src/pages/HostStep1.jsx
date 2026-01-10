@@ -103,7 +103,7 @@ const primaryPerson = role === "Bride" ? formData.bride : formData.groom;
       phone: primaryPerson.phone,
     };
 
-    const res = await fetch(`http://localhost:3000/api/v1/wedding/step-1`, {
+    const res = await fetch(`${API_URL}/wedding/step-1`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

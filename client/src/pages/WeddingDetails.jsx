@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Calendar, MapPin, Clock, Users, Heart, Gift, CheckCircle, DollarSign, Utensils, Wine, Music, Shirt, Phone, Mail, Languages, MapPinned } from "lucide-react";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function WeddingDetails() {
    const { weddingId } = useParams();
@@ -11,7 +12,7 @@ export default function WeddingDetails() {
     const fetchWedding = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/v1/wedding/${weddingId}`
+          `${API_URL}/wedding/${weddingId}`
         );
         const data = await res.json();
 

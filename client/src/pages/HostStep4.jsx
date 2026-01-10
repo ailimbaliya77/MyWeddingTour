@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const HostStep4 = ({ formData, setFormData }) => {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ const HostStep4 = ({ formData, setFormData }) => {
         guideSpokenLanguages: formData.guideSpokenLanguages || [],
       };
 
-      const res = await fetch("http://localhost:3000/api/v1/wedding/step-4", {
+      const res = await fetch(`${API_URL}/wedding/step-4`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

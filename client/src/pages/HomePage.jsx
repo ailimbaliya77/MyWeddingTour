@@ -8,6 +8,7 @@ import { RiNumber1, RiNumber2, RiNumber3, RiCalendarEventLine, RiMapPinLine, RiS
 import { FaGlassCheers, FaHandsHelping, FaPalette, FaMusic, FaUtensils } from "react-icons/fa";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+const API_URL = import.meta.env.VITE_API_URL;
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,7 +20,7 @@ const [loadingWeddings, setLoadingWeddings] = useState(true);
 useEffect(() => {
   const fetchWeddings = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/wedding");
+      const res = await fetch(`${API_URL}/wedding`);
       const data = await res.json();
 
       if (res.ok) {

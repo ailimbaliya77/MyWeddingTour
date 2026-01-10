@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import WeddingCard from "../components/WeddingCard";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Weddings() {
   const [weddings, setWeddings] = useState([]);
@@ -8,7 +9,7 @@ export default function Weddings() {
   useEffect(() => {
     const fetchWeddings = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/v1/wedding");
+        const res = await fetch(`${API_URL}/wedding`);
         const data = await res.json();
 
         if (res.ok) {

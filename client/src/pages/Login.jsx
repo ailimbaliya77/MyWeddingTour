@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle } from 'lucide-react';
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Login({ isOpen, onClose, onLoginSuccess }) {
-  const API_URL = import.meta.env.VITE_API_URL
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
 
   // ⭐ GOOGLE LOGIN
   const googleLogin = () => {
-    window.location.href = `http://localhost:3000/api/v1/auth/google`;
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   // ⭐ EMAIL LOGIN (Backend API)
@@ -34,7 +34,7 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/v1/auth/login", {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

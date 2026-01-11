@@ -10,6 +10,8 @@ import {
 import { authenticate } from "../middlewares/auth.middleware.js";
 import passport from "passport";
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 const authRouter = Router();
 
 authRouter.get("/refresh", issueAccessToken);
@@ -26,7 +28,7 @@ authRouter.get(
 authRouter.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "https://ailimbaliya77.github.io/MyWeddingTour/#/BecomeHost",
+    failureRedirect: `${FRONTEND_URL}/MyWeddingTour/#/BecomeHost`,
     session: false,
   }),
   authGoogle

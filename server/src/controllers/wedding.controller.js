@@ -215,6 +215,7 @@ export const weddingInfoStep5 = asyncHandler(async (req, res) => {
         linkedBankModileNumber,
       },
       $addToSet: { completedSteps: 5 },
+      status: "pending"
     },
     {
       new: true,

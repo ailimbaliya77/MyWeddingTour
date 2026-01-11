@@ -13,6 +13,7 @@ const JWT_REFRESH_EXPIRE_TIME = process.env.JWT_REFRESH_EXPIRE_TIME;
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const BASE_API_URL = process.env.BASE_API_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const authLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -135,7 +136,7 @@ export const authGoogle = asyncHandler(async (req, res) => {
     maxAge: JWT_REFRESH_EXPIRE_TIME * 24 * 60 * 60 * 1000,
   });
 
-  res.redirect(`http://localhost:5173/MyWeddingTour/#/oauth-success?accessToken=${accessToken}`);
+  res.redirect(`${FRONTEND_URL}/MyWeddingTour/#/oauth-success?accessToken=${accessToken}`);
 });
 
 export const issueAccessToken = asyncHandler(async (req, res) => {

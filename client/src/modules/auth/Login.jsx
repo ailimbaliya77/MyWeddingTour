@@ -43,8 +43,15 @@ function Login({ isOpen, onClose, onLoginSuccess }) {
       const data = await res.json();
 
       if (res.ok) {
-        // Save token
-        localStorage.setItem("accessToken", data.accessToken);
+        // backend returns { data: { accessToken, refreshToken } }
+        const accessToken = data?.data?.accessToken || data?.accessToken;
+        const refreshToken = data?.data?.refreshToken;
+        if (accessToken) {
+          localStorage.setItem("accessToken", accessToken);
+        }
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
 
         alert("Login successful!");
         onLoginSuccess?.();

@@ -27,7 +27,20 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
     throw createHttpError(400, "User not found");
   }
 
-  const { bride, groom, _id = null } = req.body;
+  const {
+    bride,
+    groom,
+    _id = null,
+    weddingStartDate,
+    weddingEndDate,
+    country,
+    region,
+    city,
+    venueName,
+    guestCapacity,
+    pricePerPerson,
+    religion,
+  } = req.body;
 
   const wedding = await WeddingsModel.findOneAndUpdate(
     { _id: _id || new mongoose.Types.ObjectId(), isDeleted: false },
@@ -35,6 +48,15 @@ export const weddingInfoStep1 = asyncHandler(async (req, res) => {
       bride,
       groom,
       hostId: id,
+      weddingStartDate,
+      weddingEndDate,
+      country,
+      region,
+      city,
+      venueName,
+      guestCapacity,
+      pricePerPerson,
+      religion,
       $addToSet: { completedSteps: 1 },
     },
     { upsert: true, new: true }
@@ -235,7 +257,7 @@ export const weddingInfoStep5 = asyncHandler(async (req, res) => {
 
 export const allWeddings = asyncHandler(async (req, res) => {
   const weddings = await WeddingsModel.find({ isDeleted: false, status: "pending"  })
-    .select("bride groom weddingStartDate weddingEndDate listingPhotoURL")
+    .select("bride groom weddingStartDate weddingEndDate listingPhotoURL city region country venueName guestCapacity pricePerPerson religion")
     .lean()
     .sort("-_id");
 

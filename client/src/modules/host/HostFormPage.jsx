@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useWeddingStore from "../store/WeddingStore";
 
 const HostFormPage = () => {
   const navigate = useNavigate();
-  const addWedding = useWeddingStore((state) => state.addWedding);
 
   const [form, setForm] = useState({
     coupleNames: "",

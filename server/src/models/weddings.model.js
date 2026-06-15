@@ -41,6 +41,9 @@ const weddingsSchema = new mongoose.Schema(
     city: { type: String, default: null },
     postalCode: { type: String, default: null },
     venueName: { type: String, default: null },
+    religion: { type: String, default: null },
+    guestCapacity: { type: Number, default: null },
+    pricePerPerson: { type: Number, default: null },
     events: [{ type: ObjectId, ref: "events" }],
     ceremonyGuide: {
       firstName: { type: String },

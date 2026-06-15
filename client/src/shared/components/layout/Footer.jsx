@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-function Footerr() {
+function Footer() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -83,4 +83,4 @@ function Footerr() {
 }
 
 
-export default Footerr
+export default Footer

@@ -1,7 +1,10 @@
 import { Heart, Users, Globe, DollarSign, ArrowRight, Star, Calendar, MapPin, Camera } from 'lucide-react';
-import img1 from '../assets/brebeach-wedding.webp';
+import { useNavigate } from 'react-router-dom';
+import img1 from '../../assets/brebeach-wedding.webp';
 
 function BecomeHost () {
+  const navigate = useNavigate();
+  const goToRegister = () => navigate('/host/list-wedding');
   
 
   const testimonials = [
@@ -54,7 +57,7 @@ function BecomeHost () {
   <section className="relative z-10 max-w-3xl mx-auto px-6 text-left bg-white/70 p-8 rounded-lg shadow-lg">
     
     <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-snug mb-6">
-      Open up your wedding to travelers
+      Open up your wedding to travelers 
     </h1>
 
     <p className="text-lg md:text-xl text-gray-700 mb-6 leading-relaxed">
@@ -62,7 +65,10 @@ function BecomeHost () {
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4">
-      <button className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-md">
+      <button
+        onClick={goToRegister}
+        className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-md"
+      >
         Host Your Event
       </button>
     </div>
@@ -201,7 +207,10 @@ function BecomeHost () {
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">It's easy to get started</h3>
                 <p className="text-gray-600">Registration takes about 10 minutes in 5 simple steps</p>
               </div>
-              <button className="bg-gradient-to-r from-rose-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center">
+              <button
+                onClick={goToRegister}
+                className="bg-gradient-to-r from-rose-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center"
+              >
                 Register Your Wedding
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>

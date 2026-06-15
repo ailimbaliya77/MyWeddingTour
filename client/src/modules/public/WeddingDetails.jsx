@@ -1,12 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Calendar, MapPin, Clock, Users, Heart, Gift, CheckCircle, DollarSign, Utensils, Wine, Music, Shirt, Phone, Mail, Languages, MapPinned } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Calendar, MapPin, Clock, Users, Heart, Gift, CheckCircle, DollarSign, Utensils, Wine, Music, Shirt, Phone, Mail, Languages, MapPinned, X } from "lucide-react";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function WeddingDetails() {
    const { weddingId } = useParams();
+   const navigate = useNavigate();
   const [wedding, setWedding] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [availability, setAvailability] = useState(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    seats: 1,
+    guestName: "",
+    guestEmail: "",
+    guestPhone: "",
+    message: "",
+  });
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  const fetchAvailability = async () => {
+    try {
+      const res = await fetch(`${API_URL}/booking/availability/${weddingId}`);
+      const data = await res.json();
+      if (res.ok) setAvailability(data.data);
+    } catch (err) {
+      console.error("Failed to fetch availability", err);
+    }
+  };
 
   useEffect(() => {
     const fetchWedding = async () => {
@@ -27,7 +51,67 @@ export default function WeddingDetails() {
     };
 
     fetchWedding();
+    fetchAvailability();
   }, []);
+
+  const openBooking = () => {
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to book a seat.");
+      return;
+    }
+    setBookingError("");
+    setBookingSuccess(false);
+    setBookingOpen(true);
+  };
+
+  const handleBookingChange = (e) => {
+    const { name, value } = e.target;
+    setBookingForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    setBookingError("");
+
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    if (!token) {
+      setBookingError("Please log in to book a seat.");
+      return;
+    }
+    if (!bookingForm.guestName.trim() || !bookingForm.guestEmail.trim()) {
+      setBookingError("Name and email are required.");
+      return;
+    }
+
+    setBookingSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/booking`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          weddingId,
+          seats: Number(bookingForm.seats),
+          guestName: bookingForm.guestName,
+          guestEmail: bookingForm.guestEmail,
+          guestPhone: bookingForm.guestPhone,
+          message: bookingForm.message,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error?.message || "Couldn't reserve a seat.");
+
+      setBookingSuccess(true);
+      fetchAvailability();
+    } catch (err) {
+      setBookingError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -182,8 +266,21 @@ export default function WeddingDetails() {
                       </div>
                     )}
 
-                    <button className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-xl transition-colors duration-300 shadow-lg hover:shadow-xl">
-                      RSVP Now
+                    {availability?.spotsLeft !== null && availability?.spotsLeft !== undefined && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                        <Users className="w-4 h-4 text-rose-500" />
+                        {availability.spotsLeft > 0
+                          ? `${availability.spotsLeft} of ${availability.guestCapacity} spots left`
+                          : "Fully booked"}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={openBooking}
+                      disabled={availability?.spotsLeft === 0}
+                      className="w-full bg-rose-500 hover:bg-rose-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      {availability?.spotsLeft === 0 ? "Fully booked" : "RSVP Now"}
                     </button>
 
                     <p className="text-xs text-gray-500 text-center mt-4">
@@ -590,11 +687,126 @@ export default function WeddingDetails() {
               We would be honored to have you join us on our special day. Your presence would mean the world to us.
             </p>
 
-            <button className="px-10 py-4 bg-white text-rose-600 font-bold rounded-full text-lg hover:bg-gray-50 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
-              RSVP Now
+            <button
+              onClick={openBooking}
+              disabled={availability?.spotsLeft === 0}
+              className="px-10 py-4 bg-white text-rose-600 font-bold rounded-full text-lg hover:bg-gray-50 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-60"
+            >
+              {availability?.spotsLeft === 0 ? "Fully booked" : "RSVP Now"}
             </button>
           </div>
         </section>
+      )}
+      {/* ================= BOOKING MODAL ================= */}
+      {bookingOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-7 relative">
+            <button
+              onClick={() => setBookingOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {bookingSuccess ? (
+              <div className="text-center py-6">
+                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Seat reserved</h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  Your spot has been confirmed. The hosts will be in touch with full details.
+                </p>
+                <button
+                  onClick={() => setBookingOpen(false)}
+                  className="bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-2.5 rounded-lg"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit} className="space-y-4">
+                <h3 className="text-xl font-bold text-gray-800">Reserve your seat</h3>
+                <p className="text-sm text-gray-500 -mt-2">
+                  {wedding.bride?.firstName} & {wedding.groom?.firstName}'s wedding
+                </p>
+
+                {bookingError && (
+                  <div className="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2">
+                    {bookingError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Your name</label>
+                  <input
+                    name="guestName"
+                    value={bookingForm.guestName}
+                    onChange={handleBookingChange}
+                    required
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="guestEmail"
+                    value={bookingForm.guestEmail}
+                    onChange={handleBookingChange}
+                    required
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input
+                      name="guestPhone"
+                      value={bookingForm.guestPhone}
+                      onChange={handleBookingChange}
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Seats</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={availability?.spotsLeft || undefined}
+                      name="seats"
+                      value={bookingForm.seats}
+                      onChange={handleBookingChange}
+                      className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Message to the couple <span className="text-gray-400 font-normal">(optional)</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={bookingForm.message}
+                    onChange={handleBookingChange}
+                    rows={3}
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={bookingSubmitting}
+                  className="w-full bg-rose-500 hover:bg-rose-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors"
+                >
+                  {bookingSubmitting ? "Reserving..." : "Confirm reservation"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

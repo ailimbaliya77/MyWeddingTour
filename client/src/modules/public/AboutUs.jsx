@@ -1,5 +1,5 @@
 import React from 'react'
-import img1 from '../assets/wedding-portrait-770x515.jpg'
+import img1 from '../../assets/wedding-portrait-770x515.jpg'
 
 function AboutUs()  {
   return (

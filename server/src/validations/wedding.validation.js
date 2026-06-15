@@ -74,17 +74,31 @@ export const weddingInfoStep3Schema = z.object({
 
         eventName: z.string().min(1, "Event name is required"),
 
-        date: z
+        startDate: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
 
-        time: z.string().regex(/^\d{2}:\d{2}$/, "Time must be HH:mm"),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/, "Time must be HH:mm"),
 
         description: z.string().optional(),
 
-        location: z.string().optional(),
+        location: z.object({
+          city: z.string().optional().nullable(),
+          country: z.string().optional().nullable(),
+          houseNumber: z.string().optional().nullable(),
+          postalCode: z.string().optional().nullable(),
+          region: z.string().optional().nullable(),
+          street: z.string().optional().nullable(),
+        }),
 
         day: z.number().min(1),
+        dressCode: z.string().optional().nullable(),
+        extraNotes: z.string().optional().nullable(),
+        foodType: z.string().optional().nullable(),
+        musicAvailable: z.boolean().optional(),
+        ritualName: z.string().optional().nullable(),
+        specialPerformance: z.string().optional().nullable(),
+        venueName: z.string().optional().nullable(),
       })
     )
     .min(1, "At least one event is required"),

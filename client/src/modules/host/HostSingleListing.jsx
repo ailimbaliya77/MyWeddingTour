@@ -1,114 +1,201 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, MapPin, ImagePlus } from "lucide-react";
+import { Heart, ImagePlus, Plus, Trash2, Check } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const EVENT_OPTIONS = [
-  {
-    key: "main",
-    ritualName: "Phera",
-    eventName: "Main wedding",
-    description: "The traditional marriage ceremony.",
-    default: true,
-  },
-  {
-    key: "sangeet",
-    ritualName: "Sangeet",
-    eventName: "Sangeet night",
-    description: "Musical night with dance & performances.",
-  },
-  {
-    key: "haldi",
-    ritualName: "Haldi",
-    eventName: "Haldi ceremony",
-    description: "Turmeric application ritual.",
-  },
-  {
-    key: "mehndi",
-    ritualName: "Mehndi",
-    eventName: "Mehndi",
-    description: "Henna application for bride & guests.",
-  },
-];
-
-const RELIGION_OPTIONS = ["Hindu", "Sikh", "Christian", "Muslim", "Modern", "Other"];
-
-const initialForm = {
-  brideFirstName: "",
-  brideLastName: "",
-  groomFirstName: "",
-  groomLastName: "",
-  weddingEmail: "",
-  phone: "",
-  religion: "",
-  storyDescription: "",
-  city: "",
-  region: "",
-  country: "",
+const emptyEvent = () => ({
+  day: 1,
+  eventName: "",
+  description: "",
+  ritualName: "",
+  foodType: "",
+  musicAvailable: false,
+  dressCode: "",
   venueName: "",
-  weddingStartDate: "",
-  weddingEndDate: "",
-  guestCapacity: "2",
-  pricePerPerson: "",
   extraNotes: "",
-};
+  specialPerformance: "",
+  startDate: "",
+  startTime: "",
+  location: {
+    country: "",
+    region: "",
+    city: "",
+    postalCode: "",
+    street: "",
+    houseNumber: "",
+  },
+});
 
-export default function HostSingleListing() {
+const HostSingleListing = () => {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState(initialForm);
-  const [selectedEvents, setSelectedEvents] = useState(
-    EVENT_OPTIONS.filter((e) => e.default).map((e) => e.key)
-  );
-  const [photo, setPhoto] = useState(null);
+  // ======================== FORM STATE (mirrors Step1-Step5 fields) ========================
+  const [role, setRole] = useState("Bride");
+
+  const [form, setForm] = useState({
+    // Step 1
+    bride: { firstName: "", lastName: "", email: "", phone: "" },
+    groom: { firstName: "", lastName: "", email: "", phone: "" },
+
+    // Step 2
+    couplePhoto: null,
+    storyDescription: "",
+    youtube: "",
+
+    // Step 3
+    totalWeddingDays: 1,
+    events: [emptyEvent()],
+
+    // Step 4
+    guideFirstName: "",
+    guideLastName: "",
+    guideEmail: "",
+    guideEmailConfirm: "",
+    guidePhoneNumber: "",
+    guideCoupleRelation: "",
+    guideSpokenLanguages: [""],
+
+    // Step 5
+    paymentMethod: "",
+    paypalEmail: "",
+    gpayNumber: "",
+    bankName: "",
+    accountNumber: "",
+    ifsc: "",
+    upiId: "",
+    otherPayment: "",
+  });
+
   const [photoPreview, setPhotoPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errors, setErrors] = useState({});
 
+  // ======================== HELPERS ========================
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const [parent, child] = name.split(".");
+
+    if (child) {
+      setForm((prev) => ({
+        ...prev,
+        [parent]: { ...prev[parent], [child]: value },
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const toggleEvent = (key) => {
-    setSelectedEvents((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-  };
-
-  const handlePhoto = (file) => {
+  const handlePhotoUpload = (file) => {
     if (!file) return;
-    setPhoto(file);
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic"];
+    if (!validTypes.includes(file.type)) {
+      alert("Invalid file type! Please upload JPG, PNG, WebP, or HEIC image.");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      alert("File size must be under 12MB.");
+      return;
+    }
+    setForm((prev) => ({ ...prev, couplePhoto: file }));
     setPhotoPreview(URL.createObjectURL(file));
+    setErrors((prev) => ({ ...prev, couplePhoto: "" }));
   };
 
+  const handleDaysChange = (e) => {
+    const nextDays = Math.max(1, Math.min(5, parseInt(e.target.value, 10) || 1));
+    setForm((prev) => ({
+      ...prev,
+      totalWeddingDays: nextDays,
+      events: prev.events.map((ev) => (ev.day > nextDays ? { ...ev, day: nextDays } : ev)),
+    }));
+  };
+
+  const updateEvent = (index, key, value) => {
+    setForm((prev) => {
+      const next = [...prev.events];
+      next[index] = { ...next[index], [key]: value };
+      return { ...prev, events: next };
+    });
+  };
+
+  const updateEventLocation = (index, key, value) => {
+    setForm((prev) => {
+      const next = [...prev.events];
+      next[index] = { ...next[index], location: { ...next[index].location, [key]: value } };
+      return { ...prev, events: next };
+    });
+  };
+
+  const addEvent = (day = 1) => {
+    setForm((prev) => ({ ...prev, events: [...prev.events, { ...emptyEvent(), day }] }));
+  };
+
+  const removeEvent = (index) => {
+    setForm((prev) => ({ ...prev, events: prev.events.filter((_, i) => i !== index) }));
+  };
+
+  const addLanguage = () => {
+    setForm((prev) => ({ ...prev, guideSpokenLanguages: [...prev.guideSpokenLanguages, ""] }));
+  };
+
+  const updateLanguage = (index, value) => {
+    setForm((prev) => {
+      const updated = [...prev.guideSpokenLanguages];
+      updated[index] = value;
+      return { ...prev, guideSpokenLanguages: updated };
+    });
+  };
+
+  // ======================== VALIDATION (same rules as Step1/2/4) ========================
   const validate = () => {
-    if (!form.brideFirstName.trim() || !form.brideLastName.trim())
-      return "Bride's full name is required.";
-    if (!form.groomFirstName.trim() || !form.groomLastName.trim())
-      return "Groom's full name is required.";
-    if (!form.weddingEmail.trim() || !form.phone.trim())
-      return "A contact email and phone number are required.";
-    if (!form.city.trim()) return "Wedding location (city) is required.";
-    if (!form.weddingStartDate) return "Start date is required.";
-    if (!photo) return "Please upload a couple photo.";
-    if (form.storyDescription.trim().length < 20)
-      return "Your story should be at least 20 characters.";
-    if (selectedEvents.length === 0)
-      return "Select at least one event guests can attend.";
-    return "";
+    const newErrors = {};
+
+    if (role === "Bride") {
+      if (!form.bride.firstName?.trim()) newErrors["bride.firstName"] = "Bride's first name is required";
+      if (!form.bride.lastName?.trim()) newErrors["bride.lastName"] = "Bride's last name is required";
+      if (!form.bride.phone?.trim()) newErrors["bride.phone"] = "Bride's phone is required";
+      if (!form.groom.firstName?.trim()) newErrors["groom.firstName"] = "Partner's first name is required";
+      if (!form.groom.lastName?.trim()) newErrors["groom.lastName"] = "Partner's last name is required";
+      if (!form.groom.email?.trim()) newErrors["groom.email"] = "Partner's email is required";
+      if (!form.groom.phone?.trim()) newErrors["groom.phone"] = "Partner's phone is required";
+    } else {
+      if (!form.groom.firstName?.trim()) newErrors["groom.firstName"] = "Groom's first name is required";
+      if (!form.groom.lastName?.trim()) newErrors["groom.lastName"] = "Groom's last name is required";
+      if (!form.groom.phone?.trim()) newErrors["groom.phone"] = "Groom's phone is required";
+      if (!form.bride.firstName?.trim()) newErrors["bride.firstName"] = "Partner's first name is required";
+      if (!form.bride.lastName?.trim()) newErrors["bride.lastName"] = "Partner's last name is required";
+      if (!form.bride.email?.trim()) newErrors["bride.email"] = "Partner's email is required";
+      if (!form.bride.phone?.trim()) newErrors["bride.phone"] = "Partner's phone is required";
+    }
+
+    if (!form.couplePhoto) newErrors.couplePhoto = "Couple photo is required";
+    if (!form.storyDescription || form.storyDescription.trim().length < 20)
+      newErrors.storyDescription = "Story must be at least 20 characters";
+
+    if (!form.guideFirstName) newErrors.guideFirstName = "First name is required";
+    if (!form.guideLastName) newErrors.guideLastName = "Last name is required";
+    if (!form.guideEmail) newErrors.guideEmail = "Email is required";
+    if (form.guideEmail !== form.guideEmailConfirm) newErrors.guideEmailConfirm = "Emails do not match";
+    if (!form.guidePhoneNumber) newErrors.guidePhoneNumber = "Phone is required";
+    if (!form.guideCoupleRelation) newErrors.guideCoupleRelation = "Relation required";
+    if (!form.guideSpokenLanguages.length || !form.guideSpokenLanguages[0])
+      newErrors.guideSpokenLanguages = "At least 1 language required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
+  // ======================== TOKEN REFRESH + AUTH FETCH ========================
   const refreshAccessToken = async () => {
     try {
-      // Try cookie-based refresh first
       let res = await fetch(`${API_URL}/auth/refresh`, {
         method: "GET",
         credentials: "include",
       });
 
-      // Fallback: send stored refresh token in body if cookie didn't work
       if (!res.ok) {
         const storedRefresh = localStorage.getItem("refreshToken");
         if (storedRefresh) {
@@ -131,15 +218,10 @@ export default function HostSingleListing() {
     }
   };
 
-  // Wraps fetch with Bearer auth; on an expired/invalid token it silently
-  // refreshes via the refresh-token cookie and retries the request once.
   const authFetch = async (url, options, tokenRef) => {
     const buildOptions = (tok) => ({
       ...options,
-      headers: {
-        ...(options.headers || {}),
-        Authorization: `Bearer ${tok}`,
-      },
+      headers: { ...(options.headers || {}), Authorization: `Bearer ${tok}` },
     });
 
     let res = await fetch(url, buildOptions(tokenRef.current));
@@ -147,8 +229,7 @@ export default function HostSingleListing() {
 
     const isExpiredToken =
       res.status === 401 ||
-      (res.status === 403 &&
-        /token/i.test(data?.message || data?.error?.message || ""));
+      (res.status === 403 && /token/i.test(data?.message || data?.error?.message || ""));
 
     if (isExpiredToken) {
       const newToken = await refreshAccessToken();
@@ -162,467 +243,878 @@ export default function HostSingleListing() {
     return { res, data };
   };
 
+  // ======================== SUBMIT (calls step-1 .. step-5, same as before) ========================
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg("");
+    setErrors((prev) => ({ ...prev, _global: "" }));
 
-    const validationError = validate();
-    if (validationError) {
-      setErrorMsg(validationError);
+    if (!validate()) {
+      setErrors((prev) => ({ ...prev, _global: "Please fill all required fields correctly." }));
       return;
     }
 
-    const initialToken =
-      localStorage.getItem("accessToken") || localStorage.getItem("token");
-
+    const initialToken = localStorage.getItem("accessToken") || localStorage.getItem("token");
     if (!initialToken) {
-      setErrorMsg("Please log in to list your wedding.");
+      alert("Login required");
+      navigate("/");
       return;
     }
 
-    // mutable holder so authFetch can update the token mid-flow after a refresh
     const tokenRef = { current: initialToken };
+    const primaryPerson = role === "Bride" ? form.bride : form.groom;
 
     setSubmitting(true);
 
     try {
-      // Step 1 — couple, location, capacity & price
-      const { res: step1Res, data: step1Data } = await authFetch(
+      // STEP 1 — couple info
+      const { res: res1, data: data1 } = await authFetch(
         `${API_URL}/wedding/step-1`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            bride: { firstName: form.brideFirstName, lastName: form.brideLastName },
-            groom: { firstName: form.groomFirstName, lastName: form.groomLastName },
-            weddingEmail: form.weddingEmail,
-            phone: form.phone,
-            weddingStartDate: form.weddingStartDate,
-            weddingEndDate: form.weddingEndDate || form.weddingStartDate,
-            country: form.country,
-            region: form.region,
-            city: form.city,
-            venueName: form.venueName,
-            guestCapacity: Number(form.guestCapacity),
-            pricePerPerson: form.pricePerPerson ? Number(form.pricePerPerson) : null,
-            religion: form.religion,
+            bride: { firstName: form.bride.firstName, lastName: form.bride.lastName },
+            groom: { firstName: form.groom.firstName, lastName: form.groom.lastName },
+            weddingEmail: primaryPerson.email,
+            phone: primaryPerson.phone,
           }),
         },
         tokenRef
       );
-      if (!step1Res.ok) throw new Error(step1Data.message || step1Data.error?.message || "Couldn't save couple details.");
-      const weddingId = step1Data.data._id;
+      if (!res1.ok) throw new Error(data1.message || data1.error?.message || "Step 1 failed");
+      const weddingId = data1.data._id;
 
-      // Step 2 — photo & story
+      // STEP 2 — photo & story
       const fd = new FormData();
       fd.append("weddingId", weddingId);
-      fd.append("couplePhoto", photo);
+      fd.append("couplePhoto", form.couplePhoto);
       fd.append("storyDescription", form.storyDescription);
-      const step2Res_data = await authFetch(
+      fd.append("youtube", form.youtube || "");
+
+      const { res: res2, data: data2 } = await authFetch(
         `${API_URL}/wedding/step-2`,
         { method: "POST", body: fd },
         tokenRef
       );
-      const { res: step2Res, data: step2Data } = step2Res_data;
-      if (!step2Res.ok) throw new Error(step2Data.message || step2Data.error?.message || "Couldn't save your photo and story.");
+      if (!res2.ok) throw new Error(data2.message || data2.error?.message || "Step 2 failed");
 
-      // Step 3 — events
-      const events = EVENT_OPTIONS.filter((opt) => selectedEvents.includes(opt.key)).map(
-        (opt, i) => ({
-          day: 1,
-          eventName: opt.eventName,
-          ritualName: opt.ritualName,
-          description: opt.description,
-          startDate: form.weddingStartDate,
-          startTime: "10:00",
-          venueName: form.venueName,
-          extraNotes: i === 0 ? form.extraNotes : "",
-          location: {
-            city: form.city,
-            region: form.region,
-            country: form.country,
-            postalCode: "",
-            street: "",
-            houseNumber: "",
-          },
-        })
-      );
-      const { res: step3Res, data: step3Data } = await authFetch(
+      // STEP 3 — events
+      const { res: res3, data: data3 } = await authFetch(
         `${API_URL}/wedding/step-3`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ weddingId, totalWeddingDays: 1, events }),
+          body: JSON.stringify({
+            weddingId,
+            totalWeddingDays: form.totalWeddingDays,
+            events: form.events,
+          }),
         },
         tokenRef
       );
-      if (!step3Res.ok) throw new Error(step3Data.message || step3Data.error?.message || "Couldn't save your events.");
+      if (!res3.ok) throw new Error(data3.message || data3.error?.message || "Step 3 failed");
 
-      // Step 4 — ceremony guide (defaults to the host, kept off the form to stay one page)
-      const { res: step4Res, data: step4Data } = await authFetch(
+      // STEP 4 — ceremony guide
+      const { res: res4, data: data4 } = await authFetch(
         `${API_URL}/wedding/step-4`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             weddingId,
-            guideFirstName: form.brideFirstName,
-            guideLastName: form.brideLastName,
-            guideEmail: form.weddingEmail,
-            guidePhoneNumber: form.phone,
-            guideCoupleRelation: "Host",
-            guideSpokenLanguages: ["English"],
+            guideFirstName: form.guideFirstName,
+            guideLastName: form.guideLastName,
+            guideEmail: form.guideEmail,
+            guidePhoneNumber: form.guidePhoneNumber,
+            guideCoupleRelation: form.guideCoupleRelation,
+            guideSpokenLanguages: form.guideSpokenLanguages.filter((l) => l.trim()),
           }),
         },
         tokenRef
       );
-      if (!step4Res.ok) throw new Error(step4Data.message || step4Data.error?.message || "Couldn't save the ceremony guide.");
+      if (!res4.ok) throw new Error(data4.message || data4.error?.message || "Step 4 failed");
 
-      // Step 5 — finalize listing (sets status to pending so it appears on /weddings)
-      const { res: step5Res, data: step5Data } = await authFetch(
+      // STEP 5 — payment / finalize (sets status pending -> appears on /weddings)
+      const { res: res5, data: data5 } = await authFetch(
         `${API_URL}/wedding/step-5`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             weddingId,
-            accountHolderName: "",
-            ifcNumber: "",
-            accountNumber: "",
-            linkedBankModileNumber: "",
+            accountHolderName: form.bankName || "",
+            ifcNumber: form.ifsc || "",
+            accountNumber: form.accountNumber || "",
+            linkedBankModileNumber: form.gpayNumber || "",
           }),
         },
         tokenRef
       );
-      if (!step5Res.ok) throw new Error(step5Data.message || step5Data.error?.message || "Couldn't finish your listing.");
+      if (!res5.ok) throw new Error(data5.message || data5.error?.message || "Step 5 failed");
 
       navigate("/weddings");
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.message || "Something went wrong. Please try again.");
+      setErrors((prev) => ({ ...prev, _global: err.message || "Something went wrong. Please try again." }));
     } finally {
       setSubmitting(false);
     }
   };
 
+  // ======================== RENDER ========================
   return (
-    <div className="min-h-screen bg-[#FBF4EA] py-14 px-4">
-      <div className="max-w-3xl mx-auto text-center mb-8">
-        <p className="text-xs font-bold tracking-widest uppercase text-orange-600 mb-3">
-          Reewaayat · Host a wedding
-        </p>
-        <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-3">
-          List your wedding
-        </h1>
-        <p className="text-gray-500 max-w-lg mx-auto">
-          Share your celebration with travelers eager to experience a real Indian wedding.
-          Fill in the details below to start reviewing guest requests.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-8">
+          <Heart className="w-12 h-12 text-rose-500 mx-auto mb-3" />
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">List Your Wedding</h1>
+          <p className="text-gray-600">Fill in all the details below in one go — no steps, no back-and-forth.</p>
+        </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-sm p-8 md:p-10 space-y-8"
-      >
-        {errorMsg && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-lg px-4 py-3">
-            {errorMsg}
+        {errors._global && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {errors._global}
           </div>
         )}
 
-        {/* About the couple */}
-        <section>
-          <h2 className="text-xl font-serif font-bold text-gray-900 mb-1">About the couple</h2>
-          <p className="text-sm text-gray-400 mb-4">Introduce yourselves to potential guests.</p>
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl px-8 py-10 space-y-10">
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Bride's name</label>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  name="brideFirstName"
-                  value={form.brideFirstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-                />
-                <input
-                  name="brideLastName"
-                  value={form.brideLastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Groom's name</label>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  name="groomFirstName"
-                  value={form.groomFirstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-                />
-                <input
-                  name="groomLastName"
-                  value={form.groomLastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-                />
-              </div>
-            </div>
-          </div>
+          {/* ========== 1. ABOUT YOU ========== */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+              About you
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">Who's filling out this listing?</p>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Contact email</label>
-              <input
-                type="email"
-                name="weddingEmail"
-                value={form.weddingEmail}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Contact phone</label>
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="+91 98765 43210"
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Wedding tradition</label>
             <select
-              name="religion"
-              value={form.religion}
-              onChange={handleChange}
-              className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-64 border px-4 py-2 rounded-lg mb-8 bg-teal-600 text-white font-medium cursor-pointer hover:bg-teal-700 transition"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
             >
-              <option value="">Select one</option>
-              {RELIGION_OPTIONS.map((r) => (
-                <option key={r} value={r}>{r}</option>
-              ))}
+              <option value="Bride">Bride</option>
+              <option value="Groom">Groom</option>
             </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Your story</label>
-            <textarea
-              name="storyDescription"
-              value={form.storyDescription}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Tell us a little about how you met, your background, and what makes your wedding special..."
-              className="border border-gray-200 rounded-lg p-3 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-            />
-          </div>
-        </section>
-
-        {/* Photo */}
-        <section>
-          <h2 className="text-xl font-serif font-bold text-gray-900 mb-1">Couple photo</h2>
-          <p className="text-sm text-gray-400 mb-4">This is the cover image guests will see first.</p>
-
-          <label className="flex items-center gap-4 border border-dashed border-gray-300 rounded-xl p-4 cursor-pointer hover:border-orange-300 transition-colors">
-            {photoPreview ? (
-              <img src={photoPreview} alt="Preview" className="w-20 h-20 object-cover rounded-lg" />
-            ) : (
-              <div className="w-20 h-20 rounded-lg bg-gray-50 flex items-center justify-center">
-                <ImagePlus className="w-6 h-6 text-gray-300" />
-              </div>
-            )}
-            <span className="text-sm text-gray-500">
-              {photo ? photo.name : "Click to upload a JPG, PNG or WebP photo"}
-            </span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/heic"
-              className="hidden"
-              onChange={(e) => handlePhoto(e.target.files?.[0])}
-            />
-          </label>
-        </section>
-
-        {/* Wedding details */}
-        <section>
-          <h2 className="text-xl font-serif font-bold text-gray-900 mb-1">Wedding details</h2>
-          <p className="text-sm text-gray-400 mb-4">Where and when is the celebration happening?</p>
-
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">City</label>
-              <div className="relative">
-                <MapPin className="w-4 h-4 text-gray-300 absolute left-3 top-1/2 -translate-y-1/2" />
+            <h3 className="text-lg font-semibold mb-3">Your contact details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label className="block mb-1 font-medium">
+                  {role}'s First Name <span className="text-red-500">*</span>
+                </label>
                 <input
-                  name="city"
-                  value={form.city}
+                  type="text"
+                  name={role === "Bride" ? "bride.firstName" : "groom.firstName"}
+                  value={role === "Bride" ? form.bride.firstName : form.groom.firstName}
                   onChange={handleChange}
-                  placeholder="e.g. Jaipur"
-                  className="border border-gray-200 rounded-lg p-2.5 pl-9 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "bride.firstName" : "groom.firstName"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Enter first name"
+                />
+                {errors[role === "Bride" ? "bride.firstName" : "groom.firstName"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "bride.firstName" : "groom.firstName"]}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  {role}'s Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name={role === "Bride" ? "bride.lastName" : "groom.lastName"}
+                  value={role === "Bride" ? form.bride.lastName : form.groom.lastName}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "bride.lastName" : "groom.lastName"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Enter last name"
+                />
+                {errors[role === "Bride" ? "bride.lastName" : "groom.lastName"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "bride.lastName" : "groom.lastName"]}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  {role}'s Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name={role === "Bride" ? "bride.email" : "groom.email"}
+                  value={role === "Bride" ? form.bride.email : form.groom.email}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 border-gray-300"
                 />
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">State / region</label>
-              <input
-                name="region"
-                value={form.region}
-                onChange={handleChange}
-                placeholder="e.g. Rajasthan"
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-          </div>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Country</label>
-              <input
-                name="country"
-                value={form.country}
-                onChange={handleChange}
-                placeholder="e.g. India"
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Venue name <span className="text-gray-400 font-normal">(optional)</span></label>
-              <input
-                name="venueName"
-                value={form.venueName}
-                onChange={handleChange}
-                placeholder="e.g. The Leela Palace"
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Start date</label>
-              <input
-                type="date"
-                name="weddingStartDate"
-                value={form.weddingStartDate}
-                onChange={handleChange}
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">End date</label>
-              <input
-                type="date"
-                name="weddingEndDate"
-                value={form.weddingEndDate}
-                onChange={handleChange}
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Events */}
-        <section>
-          <h2 className="text-xl font-serif font-bold text-gray-900 mb-1">Select events</h2>
-          <p className="text-sm text-gray-400 mb-4">Which ceremonies are open for guests to attend?</p>
-
-          <div className="grid sm:grid-cols-2 gap-3">
-            {EVENT_OPTIONS.map((opt) => {
-              const checked = selectedEvents.includes(opt.key);
-              return (
-                <label
-                  key={opt.key}
-                  className={`flex items-start gap-3 border rounded-xl p-3.5 cursor-pointer transition-colors ${
-                    checked ? "border-orange-400 bg-orange-50" : "border-gray-200 hover:border-orange-200"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleEvent(opt.key)}
-                    className="mt-0.5 accent-orange-500"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{opt.eventName}</p>
-                    <p className="text-xs text-gray-400">{opt.description}</p>
-                  </div>
+              <div>
+                <label className="block mb-1 font-medium">
+                  {role}'s Phone Number <span className="text-red-500">*</span>
                 </label>
+                <input
+                  type="text"
+                  name={role === "Bride" ? "bride.phone" : "groom.phone"}
+                  value={role === "Bride" ? form.bride.phone : form.groom.phone}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "bride.phone" : "groom.phone"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="+91 1234567890"
+                />
+                {errors[role === "Bride" ? "bride.phone" : "groom.phone"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "bride.phone" : "groom.phone"]}</p>
+                )}
+              </div>
+            </div>
+
+            <h3 className="text-lg font-semibold mb-3">Partner's details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block mb-1 font-medium">
+                  Partner's First Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name={role === "Bride" ? "groom.firstName" : "bride.firstName"}
+                  value={role === "Bride" ? form.groom.firstName : form.bride.firstName}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "groom.firstName" : "bride.firstName"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Enter partner's first name"
+                />
+                {errors[role === "Bride" ? "groom.firstName" : "bride.firstName"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "groom.firstName" : "bride.firstName"]}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  Partner's Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name={role === "Bride" ? "groom.lastName" : "bride.lastName"}
+                  value={role === "Bride" ? form.groom.lastName : form.bride.lastName}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "groom.lastName" : "bride.lastName"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Enter partner's last name"
+                />
+                {errors[role === "Bride" ? "groom.lastName" : "bride.lastName"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "groom.lastName" : "bride.lastName"]}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  Partner's Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name={role === "Bride" ? "groom.email" : "bride.email"}
+                  value={role === "Bride" ? form.groom.email : form.bride.email}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "groom.email" : "bride.email"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="partner@example.com"
+                />
+                {errors[role === "Bride" ? "groom.email" : "bride.email"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "groom.email" : "bride.email"]}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  Partner's Phone <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name={role === "Bride" ? "groom.phone" : "bride.phone"}
+                  value={role === "Bride" ? form.groom.phone : form.bride.phone}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 transition ${
+                    errors[role === "Bride" ? "groom.phone" : "bride.phone"] ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="+91 1234567890"
+                />
+                {errors[role === "Bride" ? "groom.phone" : "bride.phone"] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[role === "Bride" ? "groom.phone" : "bride.phone"]}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 border bg-teal-50 rounded-xl text-gray-700 text-sm mt-8">
+              🔒 We never share your private details. Only first names are visible publicly.
+            </div>
+          </section>
+
+          {/* ========== 2. YOUR STORY ========== */}
+          <section className="pt-8 border-t">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+              Your story
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">Tell travelers about your wedding.</p>
+
+            <div className="p-4 border bg-teal-50 rounded-xl text-gray-700 text-sm mb-4">
+              📸 Please upload a photo of the to-be-married couple. Accepted formats: <b>JPG, PNG, WebP, HEIC</b>. Max size: <b>12MB</b>.
+            </div>
+            <div className="p-4 border bg-red-50 rounded-xl text-red-700 text-sm mb-6">
+              ⚠️ Do not upload photos showing exact wedding location (map/invitation). Such images will be rejected by admin.
+            </div>
+
+            <div className="mb-6">
+              <label className="flex items-center gap-4 border border-dashed border-gray-300 rounded-lg p-5 cursor-pointer hover:bg-gray-50">
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Preview" className="w-20 h-20 object-cover rounded" />
+                ) : (
+                  <div className="w-20 h-20 rounded bg-gray-100 flex items-center justify-center">
+                    <ImagePlus className="w-6 h-6 text-gray-400" />
+                  </div>
+                )}
+                <span className="text-sm text-gray-600">
+                  {form.couplePhoto ? form.couplePhoto.name : "Click to upload feature image"}
+                </span>
+                <input
+                  type="file"
+                  onChange={(e) => handlePhotoUpload(e.target.files[0])}
+                  className="hidden"
+                />
+              </label>
+              {errors.couplePhoto && <p className="text-red-500 text-xs mt-1">{errors.couplePhoto}</p>}
+            </div>
+
+            <div className="mb-6">
+              <label className="block font-medium mb-2">
+                Your Love Story <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                name="storyDescription"
+                value={form.storyDescription}
+                onChange={handleChange}
+                rows={5}
+                className={`w-full border rounded-lg px-3 py-2 ${errors.storyDescription ? "border-red-500" : "border-gray-300"}`}
+                placeholder="How did you meet? What makes your story special?"
+              />
+              {errors.storyDescription && <p className="text-red-500 text-xs mt-1">{errors.storyDescription}</p>}
+            </div>
+
+            <div>
+              <label className="block font-medium mb-2">Engagement / Love Story Video (optional)</label>
+              <input
+                type="url"
+                name="youtube"
+                value={form.youtube}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded-lg"
+                placeholder="Paste YouTube link"
+              />
+            </div>
+          </section>
+
+          {/* ========== 3. WEDDING EVENTS ========== */}
+          <section className="pt-8 border-t">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">3</span>
+              Wedding events
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">Share important details about your wedding days & ceremonies.</p>
+
+            <div className="mb-6">
+              <label className="p-4 border border-teal-200 bg-teal-50 rounded-xl text-gray-700 text-md flex items-center gap-3 flex-wrap">
+                How many days will your wedding go for?
+                <select
+                  value={form.totalWeddingDays}
+                  onChange={handleDaysChange}
+                  className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm"
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>{n} Day{n > 1 ? "s" : ""}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="p-4 border border-teal-200 bg-teal-50 rounded-xl text-gray-700 text-sm mb-8 flex items-start gap-3">
+              <div className="text-teal-600 text-lg mt-1">ℹ️</div>
+              <p>
+                You are required to offer food and drinks (non alcoholic) at the wedding. Accommodation and
+                transportation are not included in the price the travelers pay. You can offer these as extras
+                after they've booked.
+              </p>
+            </div>
+
+            {Array.from({ length: form.totalWeddingDays }).map((_, dayIdx) => {
+              const dayNumber = dayIdx + 1;
+              const dayEvents = form.events
+                .map((ev, idx) => ({ ...ev, __realIndex: idx }))
+                .filter((ev) => ev.day === dayNumber);
+
+              return (
+                <div key={dayNumber} className="mb-10 bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200">
+                  <h3 className="text-xl font-semibold text-teal-700 mb-4">Day {dayNumber} — Wedding Functions</h3>
+
+                  {dayEvents.map((ev) => {
+                    const realIndex = ev.__realIndex;
+                    return (
+                      <div key={realIndex} className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm mb-6">
+                        <div className="flex items-center justify-between gap-3 mb-4">
+                          <h4 className="text-lg font-semibold text-pink-700">Event (Day {dayNumber})</h4>
+                          {form.events.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeEvent(realIndex)}
+                              className="px-3 py-1 rounded-lg text-sm bg-red-600 text-white hover:bg-red-700 flex items-center gap-1"
+                            >
+                              <Trash2 className="w-4 h-4" /> Remove
+                            </button>
+                          )}
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="Name of the event (e.g., Sangeet, Haldi)"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.eventName}
+                          onChange={(e) => updateEvent(realIndex, "eventName", e.target.value)}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-gray-700 text-sm mb-1">When does it start? *</label>
+                            <input
+                              type="date"
+                              className="w-full border rounded-lg px-3 py-2 bg-white shadow-sm"
+                              value={ev.startDate || ""}
+                              onChange={(e) => updateEvent(realIndex, "startDate", e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-gray-700 text-sm mb-1">What time does it start? *</label>
+                            <input
+                              type="time"
+                              className="w-full border rounded-lg px-3 py-2 bg-white shadow-sm"
+                              value={ev.startTime || ""}
+                              onChange={(e) => updateEvent(realIndex, "startTime", e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <textarea
+                          rows={3}
+                          placeholder="Tell travelers what will happen at this event..."
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.description}
+                          onChange={(e) => updateEvent(realIndex, "description", e.target.value)}
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Food Type (Veg / Non-Veg / Both)"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.foodType}
+                          onChange={(e) => updateEvent(realIndex, "foodType", e.target.value)}
+                        />
+
+                        <label className="flex items-center gap-2 mb-4">
+                          <input
+                            type="checkbox"
+                            checked={!!ev.musicAvailable}
+                            onChange={(e) => updateEvent(realIndex, "musicAvailable", e.target.checked)}
+                          />
+                          <span className="text-gray-700">Will there be music or dance?</span>
+                        </label>
+
+                        <input
+                          type="text"
+                          placeholder="Dress code (optional)"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.dressCode}
+                          onChange={(e) => updateEvent(realIndex, "dressCode", e.target.value)}
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Venue Name"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.venueName}
+                          onChange={(e) => updateEvent(realIndex, "venueName", e.target.value)}
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Ritual name (optional)"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.ritualName}
+                          onChange={(e) => updateEvent(realIndex, "ritualName", e.target.value)}
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Special performance (optional)"
+                          className="w-full px-3 py-2 border rounded-lg mb-4 shadow-sm"
+                          value={ev.specialPerformance}
+                          onChange={(e) => updateEvent(realIndex, "specialPerformance", e.target.value)}
+                        />
+
+                        <h5 className="font-semibold text-gray-700 mb-2 mt-4">Event Location</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <input
+                            type="text"
+                            placeholder="Country"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.country}
+                            onChange={(e) => updateEventLocation(realIndex, "country", e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="City"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.city}
+                            onChange={(e) => updateEventLocation(realIndex, "city", e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Region"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.region}
+                            onChange={(e) => updateEventLocation(realIndex, "region", e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Postal Code"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.postalCode}
+                            onChange={(e) => updateEventLocation(realIndex, "postalCode", e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Street"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.street}
+                            onChange={(e) => updateEventLocation(realIndex, "street", e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="House Number"
+                            className="border px-3 py-2 rounded-lg shadow-sm"
+                            value={ev.location.houseNumber}
+                            onChange={(e) => updateEventLocation(realIndex, "houseNumber", e.target.value)}
+                          />
+                        </div>
+
+                        <textarea
+                          rows={3}
+                          placeholder="Any important notes for guests?"
+                          className="w-full px-3 py-2 border rounded-lg mt-4 shadow-sm"
+                          value={ev.extraNotes}
+                          onChange={(e) => updateEvent(realIndex, "extraNotes", e.target.value)}
+                        />
+                      </div>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2"
+                    onClick={() => addEvent(dayNumber)}
+                  >
+                    <Plus className="w-4 h-4" /> Add another function
+                  </button>
+                </div>
               );
             })}
-          </div>
-        </section>
+          </section>
 
-        {/* Hosting preferences */}
-        <section>
-          <h2 className="text-xl font-serif font-bold text-gray-900 mb-1">Hosting preferences</h2>
-          <p className="text-sm text-gray-400 mb-4">Set your availability and terms.</p>
+          {/* ========== 4. CEREMONY GUIDE ========== */}
+          <section className="pt-8 border-t">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">4</span>
+              Ceremony guide
+            </h2>
+            <p className="text-sm text-gray-500 mb-6">Nominate someone guests can contact before the wedding.</p>
 
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Guest capacity</label>
-              <select
-                name="guestCapacity"
-                value={form.guestCapacity}
-                onChange={handleChange}
-                className="border border-gray-200 rounded-lg p-2.5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-              >
-                <option value="2">Up to 2 guests</option>
-                <option value="5">Up to 5 guests</option>
-                <option value="10">Up to 10 guests</option>
-                <option value="20">Up to 20 guests</option>
-                <option value="50">Up to 50 guests</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Price per guest (USD)</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block mb-1">Guide First Name *</label>
                 <input
-                  type="number"
-                  name="pricePerPerson"
-                  value={form.pricePerPerson}
+                  type="text"
+                  name="guideFirstName"
+                  value={form.guideFirstName}
                   onChange={handleChange}
-                  placeholder="e.g. 150"
-                  className="border border-gray-200 rounded-lg p-2.5 pl-6 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
+                  className="w-full border rounded px-3 py-2"
                 />
+                {errors.guideFirstName && <p className="text-red-600 text-xs">{errors.guideFirstName}</p>}
+              </div>
+              <div>
+                <label className="block mb-1">Guide Last Name *</label>
+                <input
+                  type="text"
+                  name="guideLastName"
+                  value={form.guideLastName}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.guideLastName && <p className="text-red-600 text-xs">{errors.guideLastName}</p>}
               </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Special instructions <span className="text-gray-400 font-normal">(optional)</span></label>
-            <textarea
-              name="extraNotes"
-              value={form.extraNotes}
-              onChange={handleChange}
-              rows={3}
-              placeholder="e.g. Guests must dress modestly, no photography during main ritual..."
-              className="border border-gray-200 rounded-lg p-3 text-sm w-full focus:outline-none focus:ring-2 focus:ring-orange-200"
-            />
-          </div>
-        </section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block mb-1">Guide Email *</label>
+                <input
+                  type="email"
+                  name="guideEmail"
+                  value={form.guideEmail}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.guideEmail && <p className="text-red-600 text-xs">{errors.guideEmail}</p>}
+              </div>
+              <div>
+                <label className="block mb-1">Confirm Guide Email *</label>
+                <input
+                  type="email"
+                  name="guideEmailConfirm"
+                  value={form.guideEmailConfirm}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.guideEmailConfirm && <p className="text-red-600 text-xs">{errors.guideEmailConfirm}</p>}
+              </div>
+            </div>
 
-        <div className="flex justify-end pt-2 border-t border-gray-100">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white font-semibold px-7 py-3 rounded-xl flex items-center gap-2 transition-colors"
-          >
-            <Heart className="w-4 h-4" />
-            {submitting ? "Submitting..." : "Submit listing"}
-          </button>
-        </div>
-      </form>
+            <div className="mb-6">
+              <label className="block mb-1">Guide Phone Number *</label>
+              <input
+                type="tel"
+                name="guidePhoneNumber"
+                value={form.guidePhoneNumber}
+                onChange={handleChange}
+                placeholder="+911234567890"
+                className="w-full border rounded px-3 py-2"
+              />
+              {errors.guidePhoneNumber && <p className="text-red-600 text-xs">{errors.guidePhoneNumber}</p>}
+            </div>
+
+            <div className="mb-6">
+              <label className="block mb-1">Guide-Couple Relationship *</label>
+              <input
+                type="text"
+                name="guideCoupleRelation"
+                value={form.guideCoupleRelation}
+                onChange={handleChange}
+                placeholder="e.g. Brother, Aunt"
+                className="w-full border rounded px-3 py-2"
+              />
+              {errors.guideCoupleRelation && <p className="text-red-600 text-xs">{errors.guideCoupleRelation}</p>}
+            </div>
+
+            <div>
+              <label className="block mb-2">Guide Spoken Languages *</label>
+              {form.guideSpokenLanguages.map((lang, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={lang}
+                  onChange={(e) => updateLanguage(index, e.target.value)}
+                  placeholder="e.g. English"
+                  className="w-full border rounded px-3 py-2 mb-2"
+                />
+              ))}
+              <button
+                type="button"
+                onClick={addLanguage}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                + Add Language
+              </button>
+              {errors.guideSpokenLanguages && <p className="text-red-600 text-xs mt-1">{errors.guideSpokenLanguages}</p>}
+            </div>
+          </section>
+
+          {/* ========== 5. RECEIVE CONTRIBUTIONS ========== */}
+          <section className="pt-8 border-t">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm font-bold">5</span>
+              Receive traveler contributions
+            </h2>
+
+            <div className="mb-6 mt-4 p-4 border rounded-lg bg-gray-50 text-sm text-gray-700">
+              <p>
+                💰 From each traveler attending your wedding you will receive <b>60% of traveler contribution</b>{" "}
+                (minimum of USD 60) as a wedding gift through MyWeddingTour.
+              </p>
+              <p className="mt-2 font-semibold">Traveler contributions include:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Access to wedding on the chosen day</li>
+                <li>Connection with Ceremony Guide before the wedding</li>
+                <li>Access to meals on the chosen day</li>
+              </ul>
+              <p className="mt-2 font-semibold">Traveler contributions should NOT include:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Transportation to the wedding venue</li>
+                <li>Accommodation at the wedding</li>
+              </ul>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                How would you like to receive your wedding contribution?
+              </label>
+              <select
+                name="paymentMethod"
+                value={form.paymentMethod}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+              >
+                <option value="">Select a method</option>
+                <option value="PayPal">PayPal</option>
+                <option value="GooglePay">Google Pay (GPay)</option>
+                <option value="BankTransfer">Bank Transfer</option>
+                <option value="UPI">UPI ID</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {form.paymentMethod === "PayPal" && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  PayPal Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="paypalEmail"
+                  value={form.paypalEmail}
+                  onChange={handleChange}
+                  placeholder="Your PayPal email"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
+
+            {form.paymentMethod === "GooglePay" && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Google Pay (GPay) Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="gpayNumber"
+                  value={form.gpayNumber}
+                  onChange={handleChange}
+                  placeholder="Enter your GPay linked number"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
+
+            {form.paymentMethod === "BankTransfer" && (
+              <div className="mb-6 space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Bank Account Holder Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="bankName"
+                  value={form.bankName}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+                <label className="block text-sm font-medium text-gray-700">
+                  Bank Account Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="accountNumber"
+                  value={form.accountNumber}
+                  onChange={handleChange}
+                  placeholder="1234 5678 9101"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+                <label className="block text-sm font-medium text-gray-700">
+                  IFSC / SWIFT Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="ifsc"
+                  value={form.ifsc}
+                  onChange={handleChange}
+                  placeholder="IFSC or SWIFT code"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
+
+            {form.paymentMethod === "UPI" && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  UPI ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="upiId"
+                  value={form.upiId}
+                  onChange={handleChange}
+                  placeholder="example@upi"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
+
+            {form.paymentMethod === "Other" && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Specify Payment Method</label>
+                <input
+                  type="text"
+                  name="otherPayment"
+                  value={form.otherPayment}
+                  onChange={handleChange}
+                  placeholder="Enter your payment details"
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
+
+            <div className="p-4 border rounded-lg bg-gray-50 text-sm text-gray-700">
+              <p className="font-semibold mb-2">⏳ When will I receive the traveler contributions?</p>
+              <p>
+                Money collected from bookings will be deposited into MyWeddingTour's account and transferred to
+                you after the last day of your wedding is over.
+              </p>
+            </div>
+          </section>
+
+          {/* SUBMIT */}
+          <div className="flex justify-end gap-4 pt-8 border-t">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-10 py-3 bg-rose-500 text-white rounded-xl font-semibold hover:bg-rose-600 disabled:opacity-60 transition transform hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              {submitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Check className="w-5 h-5" />
+                  Submit Listing
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default HostSingleListing;

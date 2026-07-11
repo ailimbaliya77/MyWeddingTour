@@ -18,7 +18,28 @@ app.use(passport.initialize());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors())
+
+// ✅ CORS fixed: explicit allowed origins + credentials support
+// Wildcard "*" cannot be combined with credentials: "include" on the frontend —
+// browsers block it. We must list exact origins instead.
+const allowedOrigins = [
+  "http://localhost:5173",              // local dev (Vite)
+  "https://myweddingtour.onrender.com", // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (e.g. curl, Postman, server-to-server)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use("/api/v1", indexRouter);
 

@@ -1,148 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { X } from "lucide-react";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
-function Login({ isOpen, onClose, onLoginSuccess }) {
-  const [show, setShow] = useState(false);
+const Login = ({ isOpen, onClose, onLoginSuccess, setGoogleLoginInProgress }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => setShow(true), 10);
-    } else {
-      setShow(false);
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  // ⭐ GOOGLE LOGIN
-  const googleLogin = () => {
-    window.location.href = `${API_URL}/auth/google`;
-  };
-
-  // ⭐ EMAIL LOGIN (Backend API)
-  const emailLogin = async () => {
-    const email = prompt("Enter your email:");
-    const password = prompt("Enter your password:");
-
-    if (!email || !password) {
-      alert("Email and password are required");
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      setLoading(true);
-
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // needed to receive the refreshToken cookie
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        // backend returns { data: { accessToken, refreshToken } }
-        const accessToken = data?.data?.accessToken || data?.accessToken;
-        const refreshToken = data?.data?.refreshToken;
-        if (accessToken) {
-          localStorage.setItem("accessToken", accessToken);
-        }
-        if (refreshToken) {
-          localStorage.setItem("refreshToken", refreshToken);
-        }
-
-        alert("Login successful!");
-        onLoginSuccess?.();
-        onClose(); // close modal
-      } else {
-        alert(data.message || "Login failed");
+      if (!res.ok) {
+        setError(data.message || "Invalid email or password");
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Something went wrong during login");
+
+      const { accessToken, refreshToken } = data.data;
+
+      // Stored under both keys — different parts of the app currently read
+      // either "token" or "accessToken", so we keep both in sync.
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("accessToken", accessToken);
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+
+      setEmail("");
+      setPassword("");
+      onLoginSuccess?.();
+      onClose?.();
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleLogin = () => {
+    setGoogleLoginInProgress?.(true);
+    window.location.href = `${API_URL}/auth/google`;
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div
-        className={`bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6 relative transform transition-all duration-300 ${
-          show ? "opacity-100 scale-100" : "opacity-0 scale-90"
-        }`}
-      >
-        {/* Close button */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
-          <X size={24} />
+          <X className="w-5 h-5" />
         </button>
 
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">
-            Log in or sign up
-          </h1>
-          <p className="text-gray-600 leading-relaxed">
-            To register a wedding, please log in to your account below.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back</h2>
+        <p className="text-sm text-gray-500 mb-6">Log in to continue</p>
 
-        {/* Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start space-x-3">
-            <AlertCircle className="text-blue-500 mt-0.5" size={20} />
-            <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
-                Important Notice
-              </h3>
-              <p className="text-blue-800 text-sm">
-                Facebook login is currently unavailable.
-              </p>
-            </div>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+            {error}
           </div>
-        </div>
+        )}
 
-        {/* Login Buttons */}
-        <div className="space-y-3">
-          {/* Google Login */}
-          <button
-            onClick={googleLogin}
-            className="flex items-center justify-center w-full border rounded-lg py-3 mb-3 hover:bg-gray-100"
-          >
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              className="w-5 h-5 mr-2"
+        <form onSubmit={handleSubmit} className="space-y-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
-            Continue with Google
-          </button>
-
-          {/* Email Login */}
-          <button
-            onClick={emailLogin}
-            disabled={loading}
-            className="flex items-center justify-center w-full border rounded-lg py-3 hover:bg-gray-100 disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "📧 Continue with email"}
-          </button>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 -mx-6 -mb-6 bg-orange-950 rounded-b-lg p-4">
-          <div className="text-center">
-            <div className="text-white text-sm opacity-90">
-              Secure login powered by MyWeddingTour
-            </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition disabled:opacity-60"
+          >
+            {loading ? "Logging in…" : "Log in"}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400">OR</span>
+          <div className="flex-1 h-px bg-gray-200" />
         </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full py-3 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition flex items-center justify-center gap-2"
+        >
+          Continue with Google
+        </button>
       </div>
     </div>
   );
-}
+};
 
 export default Login;

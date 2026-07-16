@@ -9,5 +9,8 @@ export default defineConfig({
     }
   },
   plugins: [react()],
-  base: "/MyWeddingTour/",
+  // Removed base: "/MyWeddingTour/" — that was only needed for GitHub Pages,
+  // where the site was served from a /MyWeddingTour/ subfolder.
+  // mywedding.izzotmedia.com serves from the domain root, so assets
+  // need to be requested from "/", not "/MyWeddingTour/".
 })

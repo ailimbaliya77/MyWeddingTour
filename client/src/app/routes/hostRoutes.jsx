@@ -6,6 +6,8 @@ import MainLayout from "../../layouts/MainLayout";
 import BecomeHost from "../../modules/host/BecomeHost";
 import HostLandingPage from "../../modules/host/HostLandingPage";
 import HostSingleListing from "../../modules/host/HostSingleListing";
+import HostDashboard from "../../modules/host/HostDashboard";
+import SubmissionSuccess from "../../modules/host/SubmissionSuccess";
 
 const HostRoutes = ({
   setLoginOpen,
@@ -46,6 +48,32 @@ const HostRoutes = ({
             googleLoginInProgress={googleLoginInProgress}
           >
             <HostSingleListing />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* NEW: host's own listings overview */}
+      <Route
+        path="/host/dashboard"
+        element={
+          <ProtectedRoute
+            openLogin={setLoginOpen}
+            googleLoginInProgress={googleLoginInProgress}
+          >
+            <HostDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* NEW: shown after submitting a listing */}
+      <Route
+        path="/host/success"
+        element={
+          <ProtectedRoute
+            openLogin={setLoginOpen}
+            googleLoginInProgress={googleLoginInProgress}
+          >
+            <SubmissionSuccess />
           </ProtectedRoute>
         }
       />

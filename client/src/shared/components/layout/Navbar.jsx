@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 
 
 // eslint-disable-next-line no-unused-vars
-function Navvbar({ setLoginOpen, }) {
+function Navbar({ setLoginOpen }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -12,6 +12,8 @@ useEffect(() => {
   const handleScroll = () => {
     setScrolled(window.scrollY > 40);
   };
+
+  console.log("Navbar received setLoginOpen:", setLoginOpen);
 
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
@@ -87,4 +89,4 @@ useEffect(() => {
   );
 }
 
-export default Navvbar;
+export default Navbar;

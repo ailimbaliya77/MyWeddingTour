@@ -23,17 +23,17 @@ export default function WeddingCard({ wedding }) {
 
   const badgeLabel = wedding.religion || wedding.type || null;
 
-  const title =
-    wedding.title ||
-    `${wedding.bride?.firstName ?? ""} & ${wedding.groom?.firstName ?? ""}`;
+  const coupleNames = `${wedding.bride?.firstName ?? ""} & ${wedding.groom?.firstName ?? ""}`;
 
   const description = wedding.storyDescription || wedding.description || null;
 
   const location = [wedding.city, wedding.region].filter(Boolean).join(", ");
 
+  const goToDetails = () => navigate(`/weddings/${wedding._id}`);
+
   return (
     <div
-      onClick={() => navigate(`/weddings/${wedding._id}`)}
+      onClick={goToDetails}
       className="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
     >
       {/* IMAGE */}
@@ -64,8 +64,9 @@ export default function WeddingCard({ wedding }) {
 
       {/* CONTENT */}
       <div className="p-5">
+        {/* Couple names — primary heading */}
         <h2 className="font-serif font-bold text-gray-900 text-lg leading-snug mb-1.5">
-          {title}
+          {coupleNames}
         </h2>
 
         {description && (
@@ -131,6 +132,17 @@ export default function WeddingCard({ wedding }) {
             </div>
           )}
         </div>
+
+        {/* Book Now */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            goToDetails();
+          }}
+          className="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );

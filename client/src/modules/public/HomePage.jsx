@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import Navvbar from "../../shared/components/layout/Navbar";
 import Hero from "../../components/Hero";
 import CuratedCollections from "../../components/curatedCollections";
 import TestimonialCard from "../../components/TestimonialCard";
@@ -37,8 +36,6 @@ useEffect(() => {
   fetchWeddings();
 }, []);
 
-
-  const [setLoginOpen] = useState(false);
 
   // Refs for sections
   const featureRef = useRef(null);
@@ -269,11 +266,6 @@ useEffect(() => {
 
   {/* HERO */}
   <Hero />
-
-  {/* NAVBAR */}
-  <div className="absolute top-0 left-0 w-full z-50">
-    <Navvbar setLoginOpen={setLoginOpen} />
-  </div>
 
 </div>
 

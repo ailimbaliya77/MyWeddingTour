@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes } from "react-router-dom";
 
-import PublicRoutes from "./publicroutes";
+import PublicRoutes from "./PublicRoutes";
 import AuthRoutes from "./authRoutes";
 import HostRoutes from "./hostRoutes";
 import AppRoutes from "./approutes";

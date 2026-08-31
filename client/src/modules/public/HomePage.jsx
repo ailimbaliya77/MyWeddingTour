@@ -439,7 +439,7 @@ useEffect(() => {
       </section>
 
       {/* FINAL CTA */}
-      <section ref={ctaRef} className="py-20 bg-gradient-to-r from-red-500 to-pink-500 text-white">
+      <section ref={ctaRef} className="py-20 bg-gradient-to-r from-red-500 to-orange-500 text-white">
         <div className="cta-inner container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-bold text-3xl sm:text-4xl mb-6">Your Indian Celebration Awaits</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-95">

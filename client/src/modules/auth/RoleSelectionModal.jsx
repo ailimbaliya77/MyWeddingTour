@@ -72,7 +72,7 @@ const RoleSelectionModal = ({ isOpen, onClose, onSwitchToLogin, onContinue, setG
         </div>
 
         <h2 className="text-xl font-bold text-gray-900 text-center mb-2">
-          Welcome to MyWeddingTour
+          Welcome to Reewaayat
         </h2>
         <p className="text-sm text-gray-500 text-center mb-6 px-2">
           To provide you with the best experience, please tell us how you plan to use our platform.

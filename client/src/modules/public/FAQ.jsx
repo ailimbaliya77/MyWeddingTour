@@ -20,11 +20,11 @@ const FAQ = () => {
       icon: Users,
       questions: [
         {
-          question: "What is MyWeddingTour?",
-          answer: "MyWeddingTour is an online platform that connects couples hosting special events with guests interested in being part of cultural celebrations. It facilitates connections, bookings, and seamless communication—but does not manage logistics like venues or transportation."
+          question: "What is Reewaayat?",
+          answer: "Reewaayat is an online platform that connects couples hosting special events with guests interested in being part of cultural celebrations. It facilitates connections, bookings, and seamless communication—but does not manage logistics like venues or transportation."
         },
         {
-          question: "What does MyWeddingTour actually do?",
+          question: "What does Reewaayat actually do?",
           answer: "We provide the platform for discovery, profile creation, bookings, and secure transactions. We don’t run events or offer logistics—we simply help you connect and collaborate."
         },
         {
@@ -33,7 +33,7 @@ const FAQ = () => {
         },
         {
           question: "Why would couples open their event to outside guests?",
-          answer: "Couples often want to share their traditions, showcase their culture, and make new global connections. Hosting through [YourPlatformName] allows them to broaden their experience and celebrate with a diverse audience."
+          answer: "Couples often want to share their traditions, showcase their culture, and make new global connections. Hosting through Reewaayat allows them to broaden their experience and celebrate with a diverse audience."
         },
         {
           question: "How do I know guests are respectful?",
@@ -59,31 +59,15 @@ const FAQ = () => {
     }
   ]
   return (
-    <div className="min-h-screen bg-gradient-to-br py-20 from-orange-50 via-pink-50 to-purple-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-orange-100">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center">
-            <div className="flex justify-center items-center mb-4">
-              <Heart className="w-8 h-8 text-orange-500 mr-3" />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
-                Frequently Asked Questions
-              </h1>
-            </div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Everything you need to know about creating unforgettable ticketed wedding experiences
-            </p>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br py-10 from-orange-50 via-pink-50 to-purple-50">
+      
       {/* FAQ Content */}
       <div className="max-w-4xl mx-auto px-6 py-12">
         {faqCategories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="mb-12">
             {/* Category Header */}
             <div className="flex items-center mb-6">
-              <div className="bg-gradient-to-r from-orange-500 to-purple-500 p-3 rounded-lg shadow-lg">
+              <div className="bg-gradient-to-r from-orange-500 to-white-300 p-3 rounded-lg shadow-lg">
                 <category.icon className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-2xl font-semibold text-gray-800 ml-4">

@@ -4,6 +4,7 @@ import MainLayout from "../../layouts/MainLayout";
 
 import HomePage from "../../modules/public/HomePage";
 import Weddings from "../../modules/public/Weddings";
+import HowItWorks from "../../modules/public/HowItWorks"
 import WeddingDetailsPage from "../../modules/public/WeddingDetails";
 import AboutUs from "../../modules/public/AboutUs";
 import FAQ from "../../modules/public/FAQ";
@@ -25,6 +26,15 @@ const PublicRoutes = ({ setLoginOpen }) => {
         element={
           <MainLayout setLoginOpen={setLoginOpen}>
             <Weddings />
+          </MainLayout>
+        }
+      />
+
+      <Route
+        path="/HowItWorks"
+        element={
+          <MainLayout setLoginOpen={setLoginOpen}>
+            <HowItWorks />
           </MainLayout>
         }
       />

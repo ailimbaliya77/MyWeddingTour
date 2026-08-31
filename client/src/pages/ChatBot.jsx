@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
@@ -50,7 +51,7 @@ const ChatBot = () => {
         onClick={() => setOpen(!open)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="p-4 bg-pink-500 text-white rounded-full shadow-lg hover:bg-pink-600 transition-colors"
+        className="p-4 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orenge-800 transition-colors"
       >
         {open ? <X size={22} /> : <MessageCircle size={26} />}
       </motion.button>

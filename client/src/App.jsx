@@ -17,6 +17,7 @@ import Login from "./modules/auth/Login";
 import RoleSelectionModal from "./modules/auth/RoleSelectionModal";
 import CreateAccountModal from "./modules/auth/CreateAccountModal"; // NEW
 import ChatBot from "./pages/ChatBot";
+import ScrollToTop from "./shared/components/scrollToTop";
 
 import "./App.css";
 
@@ -61,6 +62,7 @@ function App() {
   return (
     <HashRouter>
       <PublicRoutes setLoginOpen={setLoginOpen} />
+      <ScrollToTop />
 
       <AuthRoutes />
 

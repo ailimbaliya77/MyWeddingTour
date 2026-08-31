@@ -129,7 +129,7 @@ function BecomeHost () {
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="text-center group">
-                <div className="bg-gradient-to-br from-rose-500 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-to-br from-green-500 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white text-2xl font-bold">{step.number}</span>
                 </div>
                 
@@ -151,7 +151,7 @@ function BecomeHost () {
       {/* Key Features */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-gradient-to-r from-rose-500 to-purple-600 rounded-3xl p-8 md:p-12 text-white">
+          <div className="bg-gradient-to-r from-green-500 to-purple-600 rounded-3xl p-8 md:p-12 text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
               Important Details
             </h2>
@@ -209,7 +209,7 @@ function BecomeHost () {
               </div>
               <button
                 onClick={goToRegister}
-                className="bg-gradient-to-r from-rose-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center"
+                className="bg-gradient-to-r from-green-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center"
               >
                 Register Your Wedding
                 <ArrowRight className="w-5 h-5 ml-2" />

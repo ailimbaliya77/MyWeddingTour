@@ -74,11 +74,11 @@ const HostDashboard = () => {
       <aside className="w-64 shrink-0 bg-orange-50/60 border-r border-orange-100 flex flex-col">
         <div className="px-6 py-6 flex items-center gap-2">
           <Heart className="w-5 h-5 text-orange-500 fill-orange-500" />
-          <span className="text-lg font-bold text-orange-600">MyWeddingTour</span>
+          <span className="text-lg font-bold text-orange-600">Reewaayat</span>
         </div>
 
         <nav className="flex-1 px-3 space-y-1">
-          {navItems.map(({  label, active }) => (
+          {navItems.map(({ icon: Icon, label, active }) => (
             <button
               key={label}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-left ${

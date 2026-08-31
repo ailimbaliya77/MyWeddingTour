@@ -28,7 +28,7 @@ authRouter.get(
 authRouter.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${FRONTEND_URL}/MyWeddingTour/#/BecomeHost`,
+    failureRedirect: `${FRONTEND_URL}/#/BecomeHost`,
     session: false,
   }),
   authGoogle

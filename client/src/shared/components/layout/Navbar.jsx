@@ -43,6 +43,10 @@ useEffect(() => {
         Weddings
       </Link>
 
+      <Link to="/HowItWorks" className="hover:text-orange-500 transition">
+        How It Works
+      </Link>
+
       <Link to="/Testimonials" className="hover:text-orange-500 transition">
         Testimonials
       </Link>
@@ -54,6 +58,7 @@ useEffect(() => {
       <Link to="/contact" className="hover:text-orange-500 transition">
         Contact Us
       </Link>
+     
     </div>
 
     {/* Right Side */}

@@ -136,7 +136,7 @@ export const authGoogle = asyncHandler(async (req, res) => {
     maxAge: JWT_REFRESH_EXPIRE_TIME * 24 * 60 * 60 * 1000,
   });
 
-  res.redirect(`${FRONTEND_URL}/MyWeddingTour/#/oauth-success?accessToken=${accessToken}`);
+  res.redirect(`${FRONTEND_URL}/#/oauth-success?accessToken=${accessToken}`);
 });
 
 export const issueAccessToken = asyncHandler(async (req, res) => {

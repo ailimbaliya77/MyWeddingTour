@@ -1,26 +1,33 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
+import { PartyPopper, ArrowRight } from "lucide-react";
 
 const SubmissionSuccess = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#FBF1EF] px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-5">
-          <CheckCircle2 className="w-8 h-8 text-green-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FCEBE7] rounded-full mb-5">
+          <PartyPopper className="w-7 h-7 text-[#E1614A]" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Submitted for review</h1>
-        <p className="text-gray-500 mb-8">
-          Your wedding listing is being reviewed by our team. We'll notify you
-          once it's approved and live for travelers to see.
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-3 font-serif">
+          Listing Submitted!
+        </h1>
+
+        <p className="text-[#8B807C] mb-8 leading-relaxed">
+          Thank you for sharing your culture. Your wedding listing has been
+          received and is currently under review. We'll notify you once it's
+          live on ShaadiPass.
         </p>
+
         <button
           onClick={() => navigate("/host/dashboard")}
-          className="w-full py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition"
+          className="w-full py-3 bg-[#E1614A] text-white rounded-xl font-semibold hover:bg-[#C74E39] transition flex items-center justify-center gap-2"
         >
-          Go to my dashboard
+          Go to Dashboard
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>

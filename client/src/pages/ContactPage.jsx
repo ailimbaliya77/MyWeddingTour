@@ -107,7 +107,7 @@ function ContactUs() {
 
         {/* Extra Info */}
         <div className="mt-8 text-center text-gray-600 text-sm">
-          <p>Email us at: <span className="font-medium">support@myweddingtour.com</span></p>
+          <p>Email us at: <span className="font-medium">support@Reewaayat.com</span></p>
           <p>Call us: <span className="font-medium">+91 98765 43210</span></p>
         </div>
       </div>

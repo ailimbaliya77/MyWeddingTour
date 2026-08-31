@@ -25,7 +25,7 @@ const OAuthSuccess = () => {
         if (pendingRole === 'couple' || pendingRole === 'planner') {
           navigate('/host/list-wedding');
         } else {
-          navigate('/host/dashboard');
+          navigate('/host/list-wedding');
         }
       }, 1000);
     } else {

@@ -18,7 +18,7 @@ authRouter.get("/refresh", issueAccessToken);
 authRouter.delete("/logout", authenticate, logout);
 authRouter.delete("/logout-all", authenticate, logoutAll);
 authRouter.post("/login", authLogin);
-authRouter.post("/verify", verifyEmail);
+authRouter.get("/verify", verifyEmail);
 
 authRouter.get(
   "/google",

@@ -34,26 +34,27 @@ export default function Weddings() {
 
     if (search) {
       filtered = filtered.filter((w) =>
-        w.title?.toLowerCase().includes(search.toLowerCase()) ||
-        w.location?.city?.toLowerCase().includes(search.toLowerCase()) ||
-        w.location?.country?.toLowerCase().includes(search.toLowerCase())
+        w.bride?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
+        w.groom?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
+        w.city?.toLowerCase().includes(search.toLowerCase()) ||
+        w.country?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
     if (region) {
       filtered = filtered.filter(
-        (w) => w.location?.country === region || w.location?.state === region
+        (w) => w.country === region || w.region === region
       );
     }
 
     if (type) {
-      filtered = filtered.filter((w) => w.type === type);
+      filtered = filtered.filter((w) => w.religion === type || w.type === type);
     }
 
     if (price === "low") {
-      filtered.sort((a, b) => a.price - b.price);
+      filtered.sort((a, b) => (a.pricePerPerson || 0) - (b.pricePerPerson || 0));
     } else if (price === "high") {
-      filtered.sort((a, b) => b.price - a.price);
+      filtered.sort((a, b) => (b.pricePerPerson || 0) - (a.pricePerPerson || 0));
     }
 
     setFilteredWeddings(filtered);

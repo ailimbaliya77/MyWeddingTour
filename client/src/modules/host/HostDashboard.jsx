@@ -42,6 +42,8 @@ const HostDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  const [totalEarnings, setTotalEarnings] = useState(0);
+
   useEffect(() => {
     const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
     const userRaw = localStorage.getItem("user");
@@ -49,24 +51,26 @@ const HostDashboard = () => {
       try { setUser(JSON.parse(userRaw)); } catch { /* ignore */ }
     }
 
-    // TODO: your backend currently has no "my listings" endpoint —
-    // only GET /wedding (all approved) and GET /wedding/:id exist.
-    // Add a host-scoped route (e.g. GET /wedding/mine, filtered by
-    // hostId = req.user.id, returning all statuses not just "approved")
-    // for this to show real data.
     fetch(`${API_URL}/wedding/mine`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => setListings(data.data || []))
+      .then((data) => {
+        if (Array.isArray(data.data)) {
+          // Fallback if backend hasn't updated yet
+          setListings(data.data);
+        } else if (data.data) {
+          // New backend structure
+          setListings(data.data.listings || []);
+          setTotalEarnings(data.data.totalEarnings || 0);
+        }
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
 
   const totalListings = listings.length;
   const upcomingGuests = listings.reduce((sum, w) => sum + (w.bookedCount || 0), 0);
-  // TODO: total earnings needs a real bookings/payments aggregate from the backend
-  const totalEarnings = "—";
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -166,7 +170,9 @@ const HostDashboard = () => {
                 <p className="text-sm text-gray-500">Total Earnings</p>
                 <Wallet className="w-4 h-4 text-orange-400" />
               </div>
-              <p className="text-3xl font-bold text-gray-900">{totalEarnings}</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {loading ? "…" : `$${totalEarnings.toLocaleString()}`}
+              </p>
             </div>
           </div>
 

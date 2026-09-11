@@ -79,11 +79,16 @@ export const weddingInfoStep2 = asyncHandler(async (req, res) => {
   const file = req.file;
   const { storyDescription, weddingId } = req.body;
 
-  const result = await cloudinary.uploader.upload(file.path, {
-    folder: "wedding-tour-couple-images",
-  });
-
-  fs.unlinkSync(req.file.path);
+  let result;
+  try {
+    result = await cloudinary.uploader.upload(file.path, {
+      folder: "wedding-tour-couple-images",
+    });
+  } finally {
+    if (fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+  }
 
   const wedding = await WeddingsModel.findOneAndUpdate(
     { _id: weddingId, hostId: req.user.id, isDeleted: false },
@@ -298,3 +303,183 @@ export const getWeddingById = async (req, res, next) => {
     })
   );
 };
+
+export const updateWedding = asyncHandler(async (req, res) => {
+  const { weddingId } = req.params;
+  const updateData = req.body;
+  const { id: hostId } = req.user;
+
+  // Prevent updating restricted fields
+  delete updateData.hostId;
+  delete updateData.completedSteps;
+  delete updateData.status;
+
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { _id: weddingId, hostId, isDeleted: false },
+    { $set: updateData },
+    { new: true }
+  ).lean();
+
+  if (!wedding) throw createHttpError(404, "Wedding not found or you are not authorized to update it");
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding updated successfully",
+      status: 200,
+      data: wedding,
+    })
+  );
+});
+
+export const deleteWedding = asyncHandler(async (req, res) => {
+  const { weddingId } = req.params;
+  const { id: hostId } = req.user;
+
+  const wedding = await WeddingsModel.findOneAndUpdate(
+    { _id: weddingId, hostId, isDeleted: false },
+    { isDeleted: true, deletedAt: new Date() },
+    { new: true }
+  ).lean();
+
+  if (!wedding) throw createHttpError(404, "Wedding not found or you are not authorized to delete it");
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding deleted successfully",
+      status: 200,
+    })
+  );
+});
+
+export const createSingleWedding = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+
+  // Make user a planner/host
+  await UserModel.findByIdAndUpdate(id, { isPlanner: true });
+
+  const {
+    brideName,
+    groomName,
+    story,
+    location,
+    venueName,
+    startDate,
+    endDate,
+    events,
+    guestCapacity,
+    pricePerGuest,
+    specialInstructions,
+    status
+  } = req.body;
+
+  // Map guestCapacity string to number if possible
+  let capacity = 2; // Default
+  if (guestCapacity) {
+    const match = guestCapacity.match(/\d+/);
+    if (match) capacity = parseInt(match[0], 10);
+  }
+
+  // Split names into first and last
+  const [bFirst, ...bLastArr] = (brideName || "").split(" ");
+  const bLast = bLastArr.length > 0 ? bLastArr.join(" ") : "-";
+
+  const [gFirst, ...gLastArr] = (groomName || "").split(" ");
+  const gLast = gLastArr.length > 0 ? gLastArr.join(" ") : "-";
+
+  // Create wedding
+  const wedding = await WeddingsModel.create({
+    bride: { firstName: bFirst || "-", lastName: bLast },
+    groom: { firstName: gFirst || "-", lastName: gLast },
+    storyDescription: story,
+    city: location,
+    venueName,
+    weddingStartDate: startDate,
+    weddingEndDate: endDate,
+    guestCapacity: capacity,
+    pricePerPerson: pricePerGuest ? Number(pricePerGuest) : null,
+    hostId: id,
+    status: status || "pending",
+    completedSteps: [1, 2, 3, 4, 5] // mark all steps completed since it's a single form
+  });
+
+  // Create events
+  const eventIds = [];
+  if (events && Array.isArray(events)) {
+    // Determine a fallback country if none is provided. The simplified form only has `location` (city).
+    // We can extract a fallback country if they typed "City, Country"
+    const locationParts = (location || "").split(",");
+    const fallbackCountry = locationParts.length > 1 ? locationParts[locationParts.length - 1].trim() : "India";
+    const fallbackCity = locationParts[0]?.trim() || "Unknown City";
+
+    for (let i = 0; i < events.length; i++) {
+      const evt = events[i];
+      const dbEvent = await EventsModel.create({
+        name: evt, // evt is just the key like "mainWedding"
+        date: new Date(startDate || Date.now()), // fallback to now if empty
+        description: specialInstructions || "Traditional wedding celebration",
+        day: i + 1,
+        location: { 
+          city: fallbackCity, 
+          country: fallbackCountry 
+        }
+      });
+      eventIds.push(dbEvent._id);
+    }
+
+    await WeddingsModel.findByIdAndUpdate(wedding._id, { events: eventIds });
+  }
+
+  res.json(
+    getSuccessResponse({
+      message: "Wedding listing created successfully",
+      status: 201,
+      data: wedding,
+    })
+  );
+});
+
+export const getMyWeddings = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+
+  const weddings = await WeddingsModel.find({ hostId: id, isDeleted: false })
+    .select("bride groom weddingStartDate weddingEndDate listingPhotoURL city region country venueName guestCapacity pricePerPerson religion status")
+    .lean()
+    .sort("-_id");
+
+  const { BookingModel } = await import("../models/booking.model.js");
+
+  const weddingIds = weddings.map((w) => w._id);
+  const bookings = await BookingModel.find({
+    weddingId: { $in: weddingIds },
+    status: "confirmed"
+  }).lean();
+
+  let totalEarnings = 0;
+
+  const listings = weddings.map((w) => {
+    const wBookings = bookings.filter(
+      (b) => b.weddingId.toString() === w._id.toString()
+    );
+    const bookedCount = wBookings.reduce((sum, b) => sum + (b.seats || 1), 0);
+    const earnings = bookedCount * (w.pricePerPerson || 0);
+
+    totalEarnings += earnings;
+
+    return {
+      ...w,
+      bookedCount,
+      earnings,
+    };
+  });
+
+  res.json(
+    getSuccessResponse({
+      message: "My weddings retrieved successfully",
+      status: 200,
+      data: {
+        listings,
+        totalEarnings,
+      },
+    })
+  );
+});

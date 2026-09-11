@@ -83,16 +83,20 @@ const HostSingleListing = () => {
 
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_URL}/listings`, {
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/wedding/create-single`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ ...form, status: isDraft ? "draft" : "pending" }),
       });
 
       if (!res.ok) throw new Error("Failed to submit listing");
 
-      navigate(isDraft ? "/host/dashboard" : "/host/submission-success");
+      navigate(isDraft ? "/host/dashboard" : "/host/success");
     } catch (err) {
       console.error(err);
       alert("Something went wrong submitting your listing. Please try again.");

@@ -36,7 +36,7 @@ export const userRegistration = asyncHandler(async (req, res) => {
   const emailContent = `
     <h2>Hello ${firstName},</h2>
     <p>Click the link below to verify your email:</p>
-    <a href="${BASE_API_URL}/auth/verify?token=${verificationToken}">Verify Email</a>
+    <a href="${BASE_API_URL}/api/v1/auth/verify?token=${verificationToken}">Verify Email</a>
   `;
 
   await sendVerificationEmail(email, 'Verify Your Email', emailContent);
@@ -57,6 +57,49 @@ export const getUsers = asyncHandler(async (_req, res) => {
     getSuccessResponse({
       message: "Users retrieved successfully",
       data: { users },
+    })
+  );
+});
+
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+
+  const user = await UserModel.findById(id).select("-password -__v -isDeleted").lean();
+  if (!user) throw createHttpError(404, "User not found");
+
+  res.json(
+    getSuccessResponse({
+      message: "Profile retrieved successfully",
+      data: user,
+    })
+  );
+});
+
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const updateData = req.body;
+
+  // Prevent restricted fields from being updated directly via this endpoint
+  delete updateData.password;
+  delete updateData.isEmailVerified;
+  delete updateData.isPlanner;
+  delete updateData.isDeleted;
+  delete updateData.provider;
+  delete updateData.googleId;
+  delete updateData.email; // Usually emails require verification to change
+
+  const user = await UserModel.findByIdAndUpdate(
+    id,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  ).select("-password -__v -isDeleted").lean();
+
+  if (!user) throw createHttpError(404, "User not found");
+
+  res.json(
+    getSuccessResponse({
+      message: "Profile updated successfully",
+      data: user,
     })
   );
 });

@@ -3,50 +3,24 @@ import { zfd } from "zod-form-data";
 import { objectIdSchema } from "../helper/helper.js";
 
 export const weddingStep1Schema = z.object({
-  bride: z.object(
-    {
-      firstName: z
-        .string({
-          invalid_type_error: "Bride first name must be string",
-          required_error: "Bride first name is required",
-        })
-        .nonempty({ message: "Bride first name cannot be empty" }),
-      lastName: z
-        .string({
-          invalid_type_error: "Bride last name must be string",
-          required_error: "Bride last name is required",
-        })
-        .nonempty({ message: "Bride last name cannot be empty" }),
-    },
-    { required_error: "Bride data is required" }
-  ),
-  groom: z.object(
-    {
-      firstName: z
-        .string({
-          invalid_type_error: "Groom first name must be string",
-          required_error: "Groom first name is required",
-        })
-        .nonempty({ message: "Groom first name cannot be empty" }),
-      lastName: z
-        .string({
-          invalid_type_error: "Groom last name must be string",
-          required_error: "Groom last name is required",
-        })
-        .nonempty({ message: "Groom last name cannot be empty" }),
-    },
-    { required_error: "Groom data is required" }
-  ),
-  weddingEmail: z
-    .string({
-      invalid_type_error: "Email must be string",
-      required_error: "Email is required",
-    })
-    .email({ message: "Invalid email format" }),
-  phone: z.string({
-    invalid_type_error: "Phone number must be string",
-    required_error: "Phone number is required",
+  bride: z.object({
+    firstName: z.string().min(1, "Bride first name cannot be empty"),
+    lastName: z.string().min(1, "Bride last name cannot be empty"),
   }),
+  groom: z.object({
+    firstName: z.string().min(1, "Groom first name cannot be empty"),
+    lastName: z.string().min(1, "Groom last name cannot be empty"),
+  }),
+  _id: objectIdSchema.optional().nullable(),
+  weddingStartDate: z.string().optional().nullable(),
+  weddingEndDate: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
+  region: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  venueName: z.string().optional().nullable(),
+  guestCapacity: z.coerce.number().optional().nullable(),
+  pricePerPerson: z.coerce.number().optional().nullable(),
+  religion: z.string().optional().nullable(),
 });
 
 export const weddingStep2Schema = zfd.formData({
@@ -123,4 +97,12 @@ export const weddingInfoStep4Schema = z.object({
   guideSpokenLanguages: z
     .array(z.string().min(1))
     .min(1, "At least one spoken language is required"),
+});
+
+export const weddingInfoStep5Schema = z.object({
+  weddingId: objectIdSchema,
+  accountHolderName: z.string().min(1, "Account holder name is required"),
+  ifcNumber: z.string().min(1, "IFC number is required"),
+  accountNumber: z.string().min(1, "Account number is required"),
+  linkedBankModileNumber: z.string().min(1, "Linked mobile number is required"),
 });

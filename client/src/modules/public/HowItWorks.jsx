@@ -22,7 +22,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <div className="bg-[#FBF1EF] pt-24">
+    <div className="bg-[#FBF1EF]">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <h1 className="font-serif text-4xl font-bold text-gray-900 mb-3 text-center">
           Your Journey to the Mandap

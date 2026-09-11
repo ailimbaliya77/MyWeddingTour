@@ -102,38 +102,38 @@ const HostSingleListing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Header — matches site nav */}
-      <header className="flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200">
-        <Link to="/" className="font-extrabold text-xl">
+    <div className="bg-[#f8f6f3] min-h-screen">
+      {/* Navbar */}
+      <header className="flex items-center justify-between px-10 py-5 bg-white border-b border-gray-100">
+        <Link to="/" className="font-extrabold text-2xl">
           <span className="text-orange-500">Ree</span>
-          <span className="text-slate-800">waayat</span>
+          <span className="text-gray-800">waayat</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-8 text-slate-600 font-medium text-sm">
-          <Link to="/weddings" className="hover:text-slate-900">Weddings</Link>
-          <Link to="/how-it-works" className="hover:text-slate-900">How It Works</Link>
-          <Link to="/testimonials" className="hover:text-slate-900">Testimonials</Link>
-          <Link to="/faqs" className="hover:text-slate-900">FAQs</Link>
-          <Link to="/contact" className="hover:text-slate-900">Contact Us</Link>
+        <nav className="hidden md:flex items-center gap-10 text-gray-700 font-medium text-base">
+          <Link to="/weddings" className="hover:text-gray-900">Weddings</Link>
+          <Link to="/how-it-works" className="hover:text-gray-900">How It Works</Link>
+          <Link to="/testimonials" className="hover:text-gray-900">Testimonials</Link>
+          <Link to="/faqs" className="hover:text-gray-900">FAQs</Link>
+          <Link to="/contact" className="hover:text-gray-900">Contact Us</Link>
         </nav>
-        <div className="flex items-center gap-5">
-          <Link to="/login" className="text-slate-700 font-medium text-sm hidden sm:block">
+        <div className="flex items-center gap-6">
+          <Link to="/login" className="text-gray-700 font-medium text-base hidden sm:block">
             Login
           </Link>
           <Link
             to="/host/dashboard"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-6 py-3 rounded-lg transition"
           >
             Become a Host
           </Link>
         </div>
       </header>
 
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-12">
-        <h1 className="text-3xl font-extrabold text-slate-800 text-center mb-2">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-16">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 text-center mb-4">
           List Your Wedding
         </h1>
-        <p className="text-slate-500 text-center mb-10 leading-relaxed">
+        <p className="text-gray-600 text-center text-lg mb-12 max-w-2xl mx-auto">
           Share your culture with the world. Please fill out the details below
           to start reviewing guest requests.
         </p>
@@ -143,16 +143,16 @@ const HostSingleListing = () => {
             e.preventDefault();
             submitListing(false);
           }}
-          className="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-200"
+          className="bg-white rounded-xl shadow-md divide-y divide-gray-100"
         >
           {/* 1. About the Couple */}
           <section className="p-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-1">About the Couple</h2>
-            <p className="text-sm text-slate-500 mb-6">Introduce yourselves to potential guests.</p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">About the Couple</h2>
+            <p className="text-sm text-gray-600 mb-6">Introduce yourselves to potential guests.</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Bride's Name
                 </label>
                 <input
@@ -161,12 +161,12 @@ const HostSingleListing = () => {
                   value={form.brideName}
                   onChange={handleChange}
                   placeholder="e.g. Priya Sharma"
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 />
                 {errors.brideName && <p className="text-red-500 text-xs mt-1">{errors.brideName}</p>}
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Groom's Name
                 </label>
                 <input
@@ -175,21 +175,21 @@ const HostSingleListing = () => {
                   value={form.groomName}
                   onChange={handleChange}
                   placeholder="e.g. Rahul Verma"
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 />
                 {errors.groomName && <p className="text-red-500 text-xs mt-1">{errors.groomName}</p>}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Story</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Your Story</label>
               <textarea
                 name="story"
                 value={form.story}
                 onChange={handleChange}
                 rows={4}
                 placeholder="Tell us a little bit about how you met, your background, and what makes your wedding special..."
-                className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
               />
               {errors.story && <p className="text-red-500 text-xs mt-1">{errors.story}</p>}
             </div>
@@ -197,29 +197,29 @@ const HostSingleListing = () => {
 
           {/* 2. Wedding Details */}
           <section className="p-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-1">Wedding Details</h2>
-            <p className="text-sm text-slate-500 mb-6">Where and when is the celebration happening?</p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">Wedding Details</h2>
+            <p className="text-sm text-gray-600 mb-6">Where and when is the celebration happening?</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Wedding Location (City)
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     name="location"
                     value={form.location}
                     onChange={handleChange}
                     placeholder="e.g. Jaipur, Rajasthan"
-                    className="w-full border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                   />
                 </div>
                 {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Venue Name (Optional)
                 </label>
                 <input
@@ -228,31 +228,31 @@ const HostSingleListing = () => {
                   value={form.venueName}
                   onChange={handleChange}
                   placeholder="e.g. The Leela Palace"
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Start Date</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Start Date</label>
                 <input
                   type="date"
                   name="startDate"
                   value={form.startDate}
                   onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 />
                 {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>}
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">End Date</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">End Date</label>
                 <input
                   type="date"
                   name="endDate"
                   value={form.endDate}
                   onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 />
                 {errors.endDate && <p className="text-red-500 text-xs mt-1">{errors.endDate}</p>}
               </div>
@@ -261,8 +261,8 @@ const HostSingleListing = () => {
 
           {/* 3. Select Events */}
           <section className="p-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-1">Select Events</h2>
-            <p className="text-sm text-slate-500 mb-6">Which ceremonies are open for guests to attend?</p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">Select Events</h2>
+            <p className="text-sm text-gray-600 mb-6">Which ceremonies are open for guests to attend?</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {EVENT_OPTIONS.map((opt) => {
@@ -272,19 +272,26 @@ const HostSingleListing = () => {
                     key={opt.key}
                     className={`flex items-start gap-3 border rounded-xl p-4 cursor-pointer transition ${
                       checked
-                        ? "border-teal-600 bg-teal-50"
-                        : "border-slate-200 hover:border-teal-400"
+                        ? "border-orange-400 bg-orange-50"
+                        : "border-gray-200 hover:border-orange-300"
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleEvent(opt.key)}
-                      className="mt-1 w-4 h-4 accent-teal-600"
-                    />
+                    <span
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleEvent(opt.key);
+                      }}
+                      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center border transition ${
+                        checked
+                          ? "bg-orange-500 border-orange-500"
+                          : "bg-white border-gray-300"
+                      }`}
+                    >
+                      {checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                    </span>
                     <div>
-                      <div className="text-sm font-semibold text-slate-800">{opt.label}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">{opt.desc}</div>
+                      <div className="text-sm font-semibold text-gray-800">{opt.label}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{opt.desc}</div>
                     </div>
                   </label>
                 );
@@ -295,19 +302,19 @@ const HostSingleListing = () => {
 
           {/* 4. Hosting Preferences */}
           <section className="p-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-1">Hosting Preferences</h2>
-            <p className="text-sm text-slate-500 mb-6">Set your availability and terms.</p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">Hosting Preferences</h2>
+            <p className="text-sm text-gray-600 mb-6">Set your availability and terms.</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Guest Capacity
                 </label>
                 <select
                   name="guestCapacity"
                   value={form.guestCapacity}
                   onChange={handleChange}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                 >
                   <option>1-2 Guests</option>
                   <option>3-5 Guests</option>
@@ -316,18 +323,18 @@ const HostSingleListing = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Price per Guest (USD)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
                   <input
                     type="number"
                     name="pricePerGuest"
                     value={form.pricePerGuest}
                     onChange={handleChange}
                     placeholder="e.g. 150"
-                    className="w-full border border-slate-300 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
                   />
                 </div>
                 {errors.pricePerGuest && <p className="text-red-500 text-xs mt-1">{errors.pricePerGuest}</p>}
@@ -335,7 +342,7 @@ const HostSingleListing = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Special Instructions / Requirements
               </label>
               <textarea
@@ -344,7 +351,7 @@ const HostSingleListing = () => {
                 onChange={handleChange}
                 rows={3}
                 placeholder="e.g. Guests must dress modestly, no photography during main ritual..."
-                className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
               />
             </div>
           </section>
@@ -355,14 +362,14 @@ const HostSingleListing = () => {
               type="button"
               onClick={() => submitListing(true)}
               disabled={submitting}
-              className="text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
+              className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition"
             >
               Save as Draft
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-2 px-7 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-semibold hover:bg-teal-700 disabled:opacity-60 transition"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 hover:opacity-90 text-white rounded-full text-sm font-bold shadow-lg disabled:opacity-60 transition"
             >
               {submitting ? (
                 <>
@@ -370,21 +377,14 @@ const HostSingleListing = () => {
                   Submitting...
                 </>
               ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  Submit Listing
-                </>
+                "Submit Listing"
               )}
             </button>
           </div>
         </form>
-      </main>
-
-      <footer className="text-center text-xs text-slate-400 py-8">
-        © 2025 Reewaayat Inc. Your privacy is important to us.
-      </footer>
+      </div>
     </div>
   );
 };
 
-export default HostSingleListing; 
+export default HostSingleListing;

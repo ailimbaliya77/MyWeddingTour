@@ -68,7 +68,7 @@ export default function Weddings() {
   }
 
   return (
-    <section className="bg-[#f8f6f3] min-h-screen py-28">
+    <section className="bg-[#f8f6f3] min-h-screen pt-8 pb-16">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}

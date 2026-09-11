@@ -59,7 +59,7 @@ const FAQ = () => {
     }
   ]
   return (
-    <div className="min-h-screen bg-gradient-to-br py-10 from-orange-50 via-pink-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br  from-orange-50 via-pink-50 to-purple-50">
       
       {/* FAQ Content */}
       <div className="max-w-4xl mx-auto px-6 py-12">

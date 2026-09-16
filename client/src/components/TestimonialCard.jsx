@@ -1,37 +1,62 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { RiStarFill } from "react-icons/ri";
 
-function TestimonialCard({ image, name, location, quote, ctaText, ctaLink }) {
+function TestimonialCard({
+  image,
+  name,
+  location,
+  worry,
+  reality,
+  ctaText,
+  ctaLink,
+}) {
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-red-100 h-full flex flex-col">
-      <div className="flex items-center mb-6">
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-16 h-16 rounded-full object-cover border-2 border-red-200"
-        />
-        <div className="ml-4">
-          <h3 className="font-bold text-lg text-gray-800">{name}</h3>
-          <p className="text-gray-600 text-sm">{location}</p>
-          <div className="flex mt-1">
+    <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#E7D3B1] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_32px_-12px_rgba(122,31,43,0.18)]">
+      {/* worry */}
+      <div className="border-b border-dashed border-[#E7D3B1] bg-[#FFF9F0] px-6 py-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#8A6A2F]">
+          Worried about
+        </p>
+        <p className="mt-1.5 font-serif text-lg font-semibold leading-snug text-[#2A1710]">
+          {worry}
+        </p>
+      </div>
+
+      {/* reality */}
+      <div className="flex flex-1 flex-col px-6 py-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#7A1F2B]">
+          What actually happened
+        </p>
+        <p className="mt-1.5 flex-grow text-[15px] leading-relaxed text-[#4A3B34]">
+          {reality}
+        </p>
+
+        <div className="mt-5 flex items-center gap-3 border-t border-[#F3E4C6] pt-4">
+          <img
+            src={image}
+            alt={name}
+            className="h-11 w-11 rounded-full border-2 border-[#C89B3C]/50 object-cover"
+          />
+          <div className="flex-1">
+            <p className="text-sm font-bold text-[#2A1710]">{name}</p>
+            <p className="text-xs text-[#8A6A2F]">{location}</p>
+          </div>
+          <div className="flex gap-0.5">
             {[...Array(5)].map((_, i) => (
-              <RiStarFill key={i} className="text-yellow-400 text-sm" />
+              <RiStarFill key={i} className="text-xs text-[#C89B3C]" />
             ))}
           </div>
         </div>
+
+        {ctaText && ctaLink && (
+          <Link
+            to={ctaLink}
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#7A1F2B] transition hover:text-[#5C1620]"
+          >
+            {ctaText} →
+          </Link>
+        )}
       </div>
-      
-      <p className="text-gray-700 mb-6 flex-grow italic">"{quote}"</p>
-      
-      {ctaText && ctaLink && (
-        <Link 
-          to={ctaLink}
-          className="mt-auto inline-flex items-center gap-2 text-red-600 font-semibold hover:text-red-700 text-sm border-t border-gray-100 pt-4"
-        >
-          {ctaText} →
-        </Link>
-      )}
     </div>
   );
 }

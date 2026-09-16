@@ -1,44 +1,50 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import { MapPin, CalendarDays, Users, Heart, ShieldCheck, Star } from "lucide-react";
 
-// Format a date range like "Apr 19, 2026 – Apr 26, 2026"
+// Format a date range like "Apr 19 – Apr 26, 2026"
 function formatDateRange(start, end) {
-  const fmt = "MMM D, YYYY";
   if (start && start.isValid() && end && end.isValid()) {
-    return `${start.format(fmt)} – ${end.format(fmt)}`;
+    const sameYear = start.year() === end.year();
+    const startFmt = sameYear ? "MMM D" : "MMM D, YYYY";
+    return `${start.format(startFmt)} – ${end.format("MMM D, YYYY")}`;
   }
-  if (start && start.isValid()) return start.format(fmt);
+  if (start && start.isValid()) return start.format("MMM D, YYYY");
   return null;
 }
 
-export default function WeddingCard({ wedding }) {
+export default function WeddingCard({ wedding, index = 0 }) {
   const navigate = useNavigate();
+  const [saved, setSaved] = useState(false);
 
   const startDate = wedding.weddingStartDate ? dayjs(wedding.weddingStartDate) : null;
-  const endDate   = wedding.weddingEndDate   ? dayjs(wedding.weddingEndDate)   : null;
+  const endDate = wedding.weddingEndDate ? dayjs(wedding.weddingEndDate) : null;
   const dateRange = formatDateRange(startDate, endDate);
 
   const spotsTotal = wedding.guestCapacity ?? null;
-  const spotsLeft  = wedding.spotsLeft ?? null;
+  const spotsLeft = wedding.spotsLeft ?? (spotsTotal != null ? spotsTotal - (wedding.bookedCount || 0) : null);
+  const isFillingUp = spotsTotal != null && spotsLeft != null && spotsLeft <= Math.max(2, Math.round(spotsTotal * 0.15));
 
   const badgeLabel = wedding.religion || wedding.type || null;
-
   const coupleNames = `${wedding.bride?.firstName ?? ""} & ${wedding.groom?.firstName ?? ""}`;
-
   const description = wedding.storyDescription || wedding.description || null;
-
   const location = [wedding.city, wedding.region].filter(Boolean).join(", ");
+  const price = wedding.pricePerPerson;
+  const rating = wedding.rating;
+  const isVerifiedHost = wedding.hostVerified ?? true;
 
   const goToDetails = () => navigate(`/weddings/${wedding._id}`);
 
   return (
     <div
       onClick={goToDetails}
-      className="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+      className="rw-rise group cursor-pointer bg-white rounded-2xl border border-[#EADFD3] overflow-hidden hover:shadow-lg hover:shadow-[#5C1A28]/8 hover:-translate-y-0.5 transition-all duration-300"
+      style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
     >
       {/* IMAGE */}
       <div
-        className="relative h-52 w-full"
+        className="relative h-52 w-full overflow-hidden"
         style={
           wedding.listingPhotoURL
             ? {
@@ -47,86 +53,86 @@ export default function WeddingCard({ wedding }) {
                 backgroundPosition: "center",
               }
             : {
-                backgroundColor: "#e5e7eb",
+                backgroundColor: "#F1E6DC",
                 backgroundImage:
-                  "linear-gradient(45deg, #f3f4f6 25%, transparent 25%), linear-gradient(-45deg, #f3f4f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f3f4f6 75%), linear-gradient(-45deg, transparent 75%, #f3f4f6 75%)",
+                  "linear-gradient(45deg, #F6EEE4 25%, transparent 25%), linear-gradient(-45deg, #F6EEE4 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #F6EEE4 75%), linear-gradient(-45deg, transparent 75%, #F6EEE4 75%)",
                 backgroundSize: "20px 20px",
                 backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
               }
         }
       >
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent transition-opacity group-hover:from-black/70" />
+
         {badgeLabel && (
-          <span className="absolute top-3 left-3 bg-orange-500 text-white text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full">
+          <span className="absolute top-3 left-3 bg-[#C9922E] text-white text-[11px] font-semibold px-3 py-1 rounded-full">
             {badgeLabel}
           </span>
         )}
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setSaved((s) => !s);
+          }}
+          aria-label={saved ? "Remove from saved" : "Save wedding"}
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:bg-white transition-colors"
+        >
+          <Heart className={`w-4 h-4 transition-colors ${saved ? "fill-[#A23E4C] text-[#A23E4C]" : "text-[#6B5750]"}`} />
+        </button>
+
+        {price != null && (
+          <span className="absolute bottom-3 right-3 bg-white/95 backdrop-blur text-[#2A1B1E] text-xs font-semibold px-2.5 py-1 rounded-full">
+            ₹{Number(price).toLocaleString("en-IN")} / guest
+          </span>
+        )}
+
+        <h2 className="absolute bottom-3 left-4 right-24 rw-serif font-semibold text-white text-lg leading-snug">
+          {coupleNames}
+        </h2>
       </div>
 
       {/* CONTENT */}
       <div className="p-5">
-        {/* Couple names — primary heading */}
-        <h2 className="font-serif font-bold text-gray-900 text-lg leading-snug mb-1.5">
-          {coupleNames}
-        </h2>
+        <div className="flex items-center gap-2 mb-2.5">
+          {isVerifiedHost && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#3F7A5D] bg-[#E7F3EC] px-2 py-0.5 rounded-full">
+              <ShieldCheck className="w-3 h-3" /> Verified host
+            </span>
+          )}
+          {rating != null && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#C9922E]">
+              <Star className="w-3 h-3 fill-[#C9922E]" /> {rating}
+            </span>
+          )}
+        </div>
 
         {description && (
-          <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-4">
-            {description}
-          </p>
+          <p className="text-[#6B5750] text-sm leading-relaxed line-clamp-2 mb-4">{description}</p>
         )}
 
-        <div className="border-t border-gray-100 pt-3 space-y-2">
+        <div className="border-t border-[#F1E6DC] pt-3 space-y-2">
           {location && (
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <svg
-                className="w-4 h-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-                <circle cx="12" cy="9" r="2.5" />
-              </svg>
+            <div className="flex items-center gap-2 text-[#6B5750] text-sm">
+              <MapPin className="w-4 h-4 shrink-0 text-[#C9922E]" />
               <span>{location}</span>
             </div>
           )}
 
           {dateRange && (
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <svg
-                className="w-4 h-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
+            <div className="flex items-center gap-2 text-[#6B5750] text-sm">
+              <CalendarDays className="w-4 h-4 shrink-0 text-[#C9922E]" />
               <span>{dateRange}</span>
             </div>
           )}
 
           {spotsTotal !== null && (
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <svg
-                className="w-4 h-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
+            <div className={`flex items-center gap-2 text-sm ${isFillingUp ? "text-[#B9691F] font-medium" : "text-[#6B5750]"}`}>
+              <Users className="w-4 h-4 shrink-0 text-[#C9922E]" />
               <span>
                 {spotsLeft !== null
-                  ? `${spotsLeft} of ${spotsTotal} spots available`
+                  ? isFillingUp
+                    ? `Only ${spotsLeft} of ${spotsTotal} spots left`
+                    : `${spotsLeft} of ${spotsTotal} spots available`
                   : `${spotsTotal} spots available`}
               </span>
             </div>
@@ -139,9 +145,9 @@ export default function WeddingCard({ wedding }) {
             e.stopPropagation();
             goToDetails();
           }}
-          className="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
+          className="mt-4 w-full bg-[#5C1A28] hover:bg-[#3C0F1A] text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
         >
-          Book Now
+          View &amp; Book
         </button>
       </div>
     </div>

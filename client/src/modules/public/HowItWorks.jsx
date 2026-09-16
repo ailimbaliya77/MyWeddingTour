@@ -1,22 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import img1 from "../../assets/istockphoto-2232665349-612x612.jpg"
+import img2 from "../../assets/communication-chat-message-contact-social-260nw-2673729553.webp"
+import img3 from "../../assets/pngtree-book-now-banner-in-hanging-style-png-image_3954940.png"
+import img4 from "../../assets/punjabi-engagement-ceremony-3.jpg"
 
 const steps = [
   {
     title: "Browse real weddings",
     desc: "Explore weddings hosted by local families across India, each with real photos, dates, and traditions.",
+    img: img1,
   },
   {
     title: "Connect before you go",
     desc: "Message your ceremony guide to ask questions and understand what to expect and how to dress.",
+    img: img2,
   },
   {
     title: "Book your seat",
     desc: "Reserve your place at the wedding and events you want to attend, with contributions going to the host family.",
+    img: img3,
   },
   {
     title: "Experience it fully",
     desc: "Join the celebration, take part in the rituals, and leave with memories and connections that last.",
+    img: img4,
   },
 ];
 
@@ -58,12 +66,9 @@ const HowItWorks = () => {
 
                 {/* Image placeholder */}
                 <div
-                  className="flex-1 w-full h-48 rounded-2xl border border-[#F0DDD8]"
+                  className="flex-1 h-64 rounded-2xl bg-cover bg-center shadow-sm"
                   style={{
-                    backgroundImage:
-                      "repeating-conic-gradient(#F1DFDA 0% 25%, #FBF1EF 0% 50%)",
-                    backgroundSize: "16px 16px",
-                    backgroundPosition: "0 0, 8px 8px",
+                    backgroundImage: `url(${s.img})`,
                   }}
                 />
               </div>

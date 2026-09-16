@@ -1,47 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hero from "../../components/Hero";
-import CuratedCollections from "../../components/curatedCollections";
-import TestimonialCard from "../../components/TestimonialCard";
+import Testimonials from "./Testimonials";
 import WeddingCard from "../../components/WeddingCard";
 import { Link } from "react-router-dom";
-import { RiNumber1, RiNumber2, RiNumber3, RiCalendarEventLine, RiMapPinLine, RiStarFill, RiArrowRightLine } from "react-icons/ri";
-import { FaGlassCheers, FaHandsHelping, FaPalette, FaMusic, FaUtensils } from "react-icons/fa";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import GuestPass from "../../components/GuestPass";
+import CelebrationStyles from "../../components/CelebrationStyles";
+import CuriosityReel from "../../components/CuriosityReel";
+import TrustGovernance from "../../components/TrustGovernance";
 const API_URL = import.meta.env.VITE_API_URL;
 
 gsap.registerPlugin(ScrollTrigger);
 
 function HomePage() {
 
-  const [featuredWeddings, setFeaturedWeddings] = useState([]);
-const [loadingWeddings, setLoadingWeddings] = useState(true);
+  const [, setFeaturedWeddings] = useState([]);
+  const [, setLoadingWeddings] = useState(true);
 
-useEffect(() => {
-  const fetchWeddings = async () => {
-    try {
-      const res = await fetch(`${API_URL}/wedding`);
-      const data = await res.json();
+  useEffect(() => {
+    const fetchWeddings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/wedding`);
+        const data = await res.json();
 
-      if (res.ok) {
-        setFeaturedWeddings((data.data || []).slice(0, 3));
+        if (res.ok) {
+          setFeaturedWeddings((data.data || []).slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Error fetching weddings", err);
+      } finally {
+        setLoadingWeddings(false);
       }
-    } catch (err) {
-      console.error("Error fetching weddings", err);
-    } finally {
-      setLoadingWeddings(false);
-    }
-  };
+    };
 
-  fetchWeddings();
-}, []);
+    fetchWeddings();
+  }, []);
+
 
 
   // Refs for sections
-  const featureRef = useRef(null);
-  const howRef = useRef(null);
-  const weddingTypesRef = useRef(null);
-  const testimonialRef = useRef(null);
   const ctaRef = useRef(null);
 
   useEffect(() => {
@@ -117,28 +115,6 @@ useEffect(() => {
         }
       );
 
-
-      // TESTIMONIALS - enhanced animation
-      gsap.utils.toArray(".testimonial-card").forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { y: 140, opacity: 0, rotateY: 10 },
-          {
-            y: 0,
-            opacity: 1,
-            rotateY: 0,
-            duration: 1.3,
-            delay: i * 0.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              toggleActions: "play reverse play reverse",
-            },
-          }
-        );
-      });
-
       // CTA - enhanced animation
       gsap.fromTo(
         ".cta-inner",
@@ -181,67 +157,6 @@ useEffect(() => {
     return () => ctx.revert();
   }, []);
 
-  const testimonials = [
-    {
-      id: 1,
-      image: "https://randomuser.me/api/portraits/women/32.jpg",
-      name: "Sarah Johnson",
-      location: "USA",
-      quote: "Attending an Indian wedding through MyWeddingTour was the most immersive cultural experience I've ever had...",
-      ctaText: "Read Sarah's full story",
-      ctaLink: "/stories/sarah"
-    },
-    {
-      id: 2,
-      image: "https://randomuser.me/api/portraits/men/54.jpg",
-      name: "Carlos Rodriguez",
-      location: "Spain",
-      quote: "I was welcomed like family at the wedding. The ceremonies were fascinating and the food was amazing!",
-      ctaText: "Watch Carlos's video diary",
-      ctaLink: "/stories/carlos"
-    },
-    {
-      id: 3,
-      image: "https://randomuser.me/api/portraits/women/45.jpg",
-      name: "Yuki Tanaka",
-      location: "Japan",
-      quote: "Everything was perfectly organized from start to finish. I learned so much about Indian wedding traditions.",
-      ctaText: "See Yuki's photos",
-      ctaLink: "/stories/yuki"
-    },
-  ];
-
-  /* const weddingTypes = [
-    {
-      id: 1,
-      title: "Grand North Indian Wedding",
-      icon: <FaGlassCheers />,
-      duration: "3-5 days",
-      highlight: "Mehndi, Sangeet, Baraat",
-      bestFor: "First-time visitors",
-      cta: "Explore Northern Weddings"
-    },
-    {
-      id: 2,
-      title: "Elegant South Indian Wedding",
-      icon: <FaHandsHelping />,
-      duration: "1-2 days",
-      highlight: "Sacred rituals, Temple ceremonies",
-      bestFor: "Spiritual seekers",
-      cta: "Explore Southern Weddings"
-    },
-    {
-      id: 3,
-      title: "Destination Beach Wedding",
-      icon: <FaPalette />,
-      duration: "2-3 days",
-      highlight: "Fusion style, International crowd",
-      bestFor: "Younger travelers",
-      cta: "Explore Destination Weddings"
-    }
-  ]; */
-
-
   const faqs = [
     {
       question: "Is it appropriate for foreigners to attend?",
@@ -270,143 +185,16 @@ useEffect(() => {
 </div>
 
       {/* CURATED COLLECTION SECTION */}
-      <section ref={featureRef} className="py-14 bg-[#f8f6f3]">
-        <CuratedCollections />
-      </section>
+      
+      <CuriosityReel />
 
-      {/* HOW IT WORKS - Enhanced */}
-      <section ref={howRef} className="py-24 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-gray-800">
-            From Curious to Celebrating in 3 Simple Steps 
-          </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto text-lg">
-            Experience authentic Indian wedding celebrations with our guided process
-          </p>
+      <GuestPass />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative">
-            {/* Connecting line */}
-            <div className="hidden lg:block absolute top-24 left-1/4 right-1/4 h-1 bg-gradient-to-r from-red-200 to-pink-200"></div>
-            
-            <div className="step-box text-center">
-              <div className="relative">
-                <div className="bg-gradient-to-br from-orange-100 to-orange-200 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <RiNumber1 className="text-orange-500 text-4xl" />
-                </div>
-                <div className="absolute -top-2 -right-2 bg-yellow-100 rounded-full p-2">
-                  <RiCalendarEventLine className="text-yellow-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-gray-800">1. Browse & Select</h3>
-              <p className="text-gray-600 mb-6">Explore upcoming weddings and choose one that matches your travel dates and interests.</p>
-              <Link to="/weddings" className="inline-flex items-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-semibold px-6 py-3 rounded-full transition-all duration-300">
-                🔍 Browse Upcoming Weddings
-              </Link>
-            </div>
+      <CelebrationStyles />
+      
+      <Testimonials />
 
-            <div className="step-box text-center">
-              <div className="relative">
-                <div className="bg-gradient-to-br from-orange-100 to-orange-200 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <RiNumber2 className="text-orange-500 text-4xl" />
-                </div>
-                <div className="absolute -top-2 -right-2 bg-green-100 rounded-full p-2">
-                  <RiMapPinLine className="text-green-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-gray-800">2. Book & Prepare</h3>
-              <p className="text-gray-600 mb-6">Secure your spot and receive our comprehensive guest guide covering attire, etiquette, and logistics.</p>
-              <Link to="/guide" className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-orange-500 font-semibold px-6 py-3 rounded-full transition-all duration-300">
-                📖 Download Guest Guide 
-              </Link>
-            </div>
-
-            <div className="step-box text-center">
-              <div className="relative">
-                <div className="bg-gradient-to-br from-orange-100 to-orange-200 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <RiNumber3 className="text-orange-500 text-4xl" />
-                </div>
-                <div className="absolute -top-2 -right-2 bg-purple-100 rounded-full p-2">
-                  <RiStarFill className="text-purple-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-gray-800">3. Celebrate & Connect</h3>
-              <p className="text-gray-600 mb-6">Immerse yourself in rituals, feast, and festivities as an honored guest of the family.</p>
-              <Link to="/experience" className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-orange-500 font-semibold px-6 py-3 rounded-full transition-all duration-300">
-                🎬 Watch a 2-Min Experience
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* WEDDING TYPES */}
-      <section ref={weddingTypesRef} className="py-20 bg-gradient-to-b from-red-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-gray-800">
-            Which Celebration Calls to You?
-          </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto text-lg">
-            Discover different wedding styles across India's diverse regions
-          </p>
-
-              {loadingWeddings ? (
-      <p className="text-center text-gray-500">Loading weddings…</p>
-    ) : (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 wedding-types-wrapper">
-        {featuredWeddings.map((wedding) => (
-          <WeddingCard key={wedding._id} wedding={wedding} />
-        ))}
-      </div>
-    )}
-
-    <div className="text-center mt-14">
-      <Link
-        to="/weddings"
-        className="inline-block border border-red-500 text-orange-500 px-8 py-4 rounded-full font-semibold hover:bg-red-50 transition"
-      >
-        Explore All Weddings
-      </Link>
-    </div>
-
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section ref={testimonialRef} className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-gray-800">
-            Travelers Share Their Unforgettable Journeys
-          </h2>
-          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto text-lg">
-            Hear from guests from around the world who experienced the magic of Indian weddings
-          </p>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <div key={t.id} className="testimonial-card">
-                <TestimonialCard 
-                  image={t.image} 
-                  name={t.name} 
-                  location={t.location} 
-                  quote={t.quote}
-                  ctaText={t.ctaText}
-                  ctaLink={t.ctaLink}
-                />
-              </div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Link 
-              to="/stories" 
-              className="inline-flex items-center gap-2 text-orange-500 font-bold text-lg hover:text-red-700 border-b-2 border-red-200 hover:border-red-600 pb-1 transition-all duration-300"
-            >
-              View More Stories from 80+ Countries
-              <RiArrowRightLine className="mt-1" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <TrustGovernance /> 
 
       {/* FAQ SECTION */}
       <section className="py-16 bg-red-50">

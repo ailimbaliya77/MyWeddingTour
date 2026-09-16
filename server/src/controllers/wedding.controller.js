@@ -286,7 +286,7 @@ export const getWeddingById = async (req, res, next) => {
     .populate({
       path: "events",
       select:
-        "name description music dance date day ritualName foodType musicAvailable specialPerformance",
+        "name description music dance date day ritualName foodType musicAvailable specialPerformance dressCode photoURL",
     })
     .select(
       "-location -isDeleted -deletedAt -wEmail -cloudinaryPublicId -postalCode -ceremonyGuide -hostId -status -completedSteps -phoneNumbe0r -__v"
@@ -361,16 +361,41 @@ export const createSingleWedding = asyncHandler(async (req, res) => {
     brideName,
     groomName,
     story,
+    hostWelcomeMessage,
     location,
     venueName,
     startDate,
     endDate,
-    events,
+    events,               // multipart form sends this as a JSON string of per-ceremony objects
+    guideName,
+    guideRelation,
+    guideEmail,
+    guidePhone,
+    guideLanguages,       // comma-separated string, e.g. "English, Hindi"
+    includeGiftDetails,   // "true" / "false" string
+    accountHolderName,
+    accountNumber,
+    ifscCode,
     guestCapacity,
     pricePerGuest,
     specialInstructions,
-    status
+    status,
   } = req.body;
+
+  // `events` arrives as a JSON string when sent via FormData (photo uploads).
+  // Fall back gracefully if it's ever sent as a real array (plain JSON requests).
+  let parsedEvents = [];
+  if (Array.isArray(events)) {
+    parsedEvents = events;
+  } else if (typeof events === "string" && events.trim()) {
+    try {
+      parsedEvents = JSON.parse(events);
+    } catch {
+      parsedEvents = [];
+    }
+  }
+
+  const hasGiftDetails = includeGiftDetails === "true" || includeGiftDetails === true;
 
   // Map guestCapacity string to number if possible
   let capacity = 2; // Default
@@ -386,11 +411,38 @@ export const createSingleWedding = asyncHandler(async (req, res) => {
   const [gFirst, ...gLastArr] = (groomName || "").split(" ");
   const gLast = gLastArr.length > 0 ? gLastArr.join(" ") : "-";
 
+  // ---- Upload bride/groom photos + invitation card (same pattern as weddingInfoStep2) ----
+  const uploadToCloudinary = async (file, folder) => {
+    if (!file) return null;
+    try {
+      const result = await cloudinary.uploader.upload(file.path, { folder });
+      return result.secure_url;
+    } finally {
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    }
+  };
+
+  const bridePhotoFile = req.files?.bridePhoto?.[0];
+  const groomPhotoFile = req.files?.groomPhoto?.[0];
+  const invitationCardFile = req.files?.invitationCard?.[0];
+
+  const [bridePhotoURL, groomPhotoURL, invitationCardURL] = await Promise.all([
+    uploadToCloudinary(bridePhotoFile, "wedding-tour-couple-images"),
+    uploadToCloudinary(groomPhotoFile, "wedding-tour-couple-images"),
+    uploadToCloudinary(invitationCardFile, "wedding-tour-invitation-cards"),
+  ]);
+
   // Create wedding
   const wedding = await WeddingsModel.create({
-    bride: { firstName: bFirst || "-", lastName: bLast },
-    groom: { firstName: gFirst || "-", lastName: gLast },
+    bride: { firstName: bFirst || "-", lastName: bLast, photoURL: bridePhotoURL || undefined },
+    groom: { firstName: gFirst || "-", lastName: gLast, photoURL: groomPhotoURL || undefined },
     storyDescription: story,
+    hostWelcomeMessage,
+    // Fall back to the invitation card as the listing's cover photo if no separate cover was provided.
+    // Invitation card is optional, so don't leave the cover photo empty if a
+    // host uploaded couple photos but skipped the invitation card.
+    listingPhotoURL: invitationCardURL || bridePhotoURL || groomPhotoURL || undefined,
+    invitationCardURL,
     city: location,
     venueName,
     weddingStartDate: startDate,
@@ -399,29 +451,64 @@ export const createSingleWedding = asyncHandler(async (req, res) => {
     pricePerPerson: pricePerGuest ? Number(pricePerGuest) : null,
     hostId: id,
     status: status || "pending",
-    completedSteps: [1, 2, 3, 4, 5] // mark all steps completed since it's a single form
+    completedSteps: [1, 2, 3, 4, 5], // mark all steps completed since it's a single form
+    ceremonyGuide: guideName
+      ? {
+          firstName: guideName,
+          guideCoupleRelation: guideRelation,
+          email: guideEmail,
+          phoneNumber: guidePhone,
+          spokenLanguages: guideLanguages
+            ? guideLanguages.split(",").map((l) => l.trim()).filter(Boolean)
+            : [],
+        }
+      : undefined,
+    bankDetails: hasGiftDetails
+      ? {
+          accountHolderName,
+          accountNumber,
+          ifcNumber: ifscCode,
+        }
+      : undefined,
   });
 
   // Create events
   const eventIds = [];
-  if (events && Array.isArray(events)) {
+  if (parsedEvents.length > 0) {
     // Determine a fallback country if none is provided. The simplified form only has `location` (city).
     // We can extract a fallback country if they typed "City, Country"
     const locationParts = (location || "").split(",");
     const fallbackCountry = locationParts.length > 1 ? locationParts[locationParts.length - 1].trim() : "India";
     const fallbackCity = locationParts[0]?.trim() || "Unknown City";
 
-    for (let i = 0; i < events.length; i++) {
-      const evt = events[i];
+    for (let i = 0; i < parsedEvents.length; i++) {
+      const evt = parsedEvents[i];
+
+      // Each ceremony sends its own key + label + details now, rather than
+      // one global dress code/food/music applied to every event.
+      const eventKey = typeof evt === "string" ? evt : evt.key;
+      const eventLabel = typeof evt === "string" ? evt : evt.label || evt.key;
+      const eventDressCode = typeof evt === "object" ? evt.dressCode : undefined;
+      const eventFoodType = typeof evt === "object" ? evt.foodType : undefined;
+      const eventMusicAvailable = typeof evt === "object" ? evt.musicAvailable === true || evt.musicAvailable === "true" : true;
+      const eventNote = typeof evt === "object" ? evt.note : undefined;
+
+      const eventPhotoFile = req.files?.[`eventPhoto_${eventKey}`]?.[0];
+      const eventPhotoURL = await uploadToCloudinary(eventPhotoFile, "wedding-tour-event-images");
+
       const dbEvent = await EventsModel.create({
-        name: evt, // evt is just the key like "mainWedding"
+        name: eventLabel,
         date: new Date(startDate || Date.now()), // fallback to now if empty
-        description: specialInstructions || "Traditional wedding celebration",
+        description: eventNote || undefined,
         day: i + 1,
-        location: { 
-          city: fallbackCity, 
-          country: fallbackCountry 
-        }
+        dressCode: eventDressCode || undefined,
+        foodType: eventFoodType || undefined,
+        musicAvailable: eventMusicAvailable,
+        photoURL: eventPhotoURL || undefined,
+        location: {
+          city: fallbackCity,
+          country: fallbackCountry,
+        },
       });
       eventIds.push(dbEvent._id);
     }

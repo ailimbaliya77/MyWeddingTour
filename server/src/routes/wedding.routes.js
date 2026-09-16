@@ -28,7 +28,21 @@ const upload = multer({ dest: "uploads/" });
 
 weddingRouter.get("/", allWeddings);
 weddingRouter.get("/mine", authenticate, getMyWeddings);
-weddingRouter.post("/create-single", authenticate, createSingleWedding);
+weddingRouter.post(
+  "/create-single",
+  authenticate,
+  upload.fields([
+    { name: "bridePhoto", maxCount: 1 },
+    { name: "groomPhoto", maxCount: 1 },
+    { name: "invitationCard", maxCount: 1 },
+    // One possible photo per ceremony type offered in the single-page listing form.
+    { name: "eventPhoto_mainWedding", maxCount: 1 },
+    { name: "eventPhoto_sangeet", maxCount: 1 },
+    { name: "eventPhoto_haldi", maxCount: 1 },
+    { name: "eventPhoto_mehndi", maxCount: 1 },
+  ]),
+  createSingleWedding
+);
 weddingRouter.post(
   "/step-1",
   authenticate,

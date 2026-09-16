@@ -2,11 +2,10 @@ import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
-    <section className="relative bg-[#f8f6f3] pt-28 pb-24">
+    <section className="relative bg-[#f8f6f3] pt-11 pb-24">
 
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
 
-        {/* LEFT CONTENT */}
         <div>
 
           {/* small badge */}

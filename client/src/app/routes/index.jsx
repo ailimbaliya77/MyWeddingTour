@@ -2,9 +2,9 @@ import React from "react";
 import { Routes } from "react-router-dom";
 
 import PublicRoutes from "./PublicRoutes";
-import AuthRoutes from "./authRoutes";
-import HostRoutes from "./hostRoutes";
-import AppRoutes from "./approutes";
+import AuthRoutes from "./AuthRoutes";
+import HostRoutes from "./HostRoutes";
+import AppRoutes from "./AppRoutes";
 
 export default function AllRoutes(props) {
   return (

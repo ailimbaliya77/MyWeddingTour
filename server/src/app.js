@@ -29,17 +29,7 @@ const allowedOrigins = [
 ];
 
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (e.g. curl, Postman, server-to-server)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS: " + origin));
-      }
-    },
-    credentials: true,
-  })
+  cors("*")
 );
 
 app.use("/api/v1", indexRouter);

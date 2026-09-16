@@ -23,8 +23,9 @@ app.use(express.urlencoded({ extended: true }));
 // Wildcard "*" cannot be combined with credentials: "include" on the frontend —
 // browsers block it. We must list exact origins instead.
 const allowedOrigins = [
-  "http://localhost:5173",              // local dev (Vite)
-  "https://myweddingtour.onrender.com", // deployed frontend
+  // "http://localhost:5173",              // local dev (Vite)
+  // "https://myweddingtour.onrender.com", // deployed frontend
+  "*"
 ];
 
 app.use(

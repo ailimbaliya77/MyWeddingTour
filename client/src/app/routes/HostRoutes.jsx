@@ -8,6 +8,8 @@ import HostLandingPage from "../../modules/host/HostLandingPage";
 import HostSingleListing from "../../modules/host/HostSingleListing";
 import HostDashboard from "../../modules/host/HostDashboard";
 import SubmissionSuccess from "../../modules/host/SubmissionSuccess";
+import BookingPage from "..//../modules/host/BookinPage"
+import PassVerification from "../../pages/PassVerification";
 
 const HostRoutes = ({
   setLoginOpen,
@@ -77,6 +79,9 @@ const HostRoutes = ({
           </ProtectedRoute>
         }
       />
+
+    <Route path="/booking/:weddingId" element={<BookingPage />} />
+    <Route path="/host/verify-pass" element={<PassVerification />} />
     </Routes>
   );
 };

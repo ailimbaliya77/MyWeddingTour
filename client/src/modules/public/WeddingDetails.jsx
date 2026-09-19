@@ -95,17 +95,6 @@ export default function WeddingDetails() {
     fetchAvailability();
   }, []);
 
-  const openBooking = () => {
-    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
-    if (!token) {
-      alert("Please log in to book a seat.");
-      return;
-    }
-    setBookingError("");
-    setBookingSuccess(false);
-    setBookingOpen(true);
-  };
-
   const handleBookingChange = (e) => {
     const { name, value } = e.target;
     setBookingForm((prev) => ({ ...prev, [name]: value }));
@@ -243,7 +232,7 @@ export default function WeddingDetails() {
               </button>
             ))}
             <button
-              onClick={openBooking}
+              onClick={() => navigate(`/booking/${wedding._id}`)}
               disabled={isFull}
               className="ml-auto shrink-0 my-2 px-5 py-2 bg-[#5C1A28] text-white rounded-full text-sm font-semibold hover:bg-[#3C0F1A] transition-colors disabled:opacity-50"
             >
@@ -552,7 +541,7 @@ export default function WeddingDetails() {
                   )}
 
                   <button
-                    onClick={openBooking}
+                    onClick={() => navigate(`/booking/${wedding._id}`)}
                     disabled={isFull}
                     className="w-full bg-[#5C1A28] hover:bg-[#3C0F1A] disabled:bg-[#D9C4B8] disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl transition-colors"
                   >
@@ -979,7 +968,7 @@ export default function WeddingDetails() {
             </p>
 
             <button
-              onClick={openBooking}
+              onClick={() => navigate(`/booking/${wedding._id}`)}
               disabled={isFull}
               className="mt-4 px-9 py-3.5 bg-[#C9922E] hover:bg-[#B9821F] text-white font-semibold rounded-full text-base transition-colors disabled:opacity-60"
             >
@@ -1002,7 +991,7 @@ export default function WeddingDetails() {
             {isFillingFast && <p className="text-[11px] text-[#B9691F] font-medium">Only {spotsLeft} seats left</p>}
           </div>
           <button
-            onClick={openBooking}
+            onClick={() => navigate(`/booking/${wedding._id}`)}
             disabled={isFull}
             className="px-6 py-2.5 bg-[#5C1A28] disabled:bg-[#D9C4B8] text-white rounded-xl text-sm font-semibold"
           >

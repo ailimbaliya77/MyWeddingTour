@@ -9,6 +9,7 @@ import WeddingDetailsPage from "../../modules/public/WeddingDetails";
 import AboutUs from "../../modules/public/AboutUs";
 import FAQ from "../../modules/public/FAQ";
 import Testimonials from "../../modules/public/Testimonials";
+import GuestPass from "../../pages/GuestPass";
 
 const PublicRoutes = ({ setLoginOpen }) => {
   return (
@@ -70,6 +71,9 @@ const PublicRoutes = ({ setLoginOpen }) => {
           </MainLayout>
         }
       />
+
+      <Route path="/booking/:bookingId/pass" element={<GuestPass />} />
+
     </Routes>
   );
 };
